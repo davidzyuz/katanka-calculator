@@ -1,0 +1,19 @@
+{
+    "name": "zyuzd/parser.loc",
+    "description": "simple parser",
+    "type": "project",
+    "authors": [
+        {
+            "name": "David Zyuz",
+            "email": "zyuzdavid@gmail.com"
+        }
+    ],
+    "require": {
+        "fabpot/goutte": "^3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "src/"
+        }
+    }
+}
