@@ -2,49 +2,56 @@
 namespace app\renderer;
 
 use app\storeManager\StoreManager;
-//TODO: должен использоваться только StoreManager.
-//parser перенести в StoreManager
-use app\parser\MinfinParser;
-use app\parser\LmeParser;
-
 
 class Renderer
 {
-    public $minfinData;
-    public $lmeData;
+    public $currentLme;
+    public $averageLme;
+    public $currentMinfin;
+    public $averageMinfin;
+    //TODO: добавить сюда переменные формул
 
     public function __construct()
     {
-        $this->minfinData = round((float)(new MinfinParser())->makeIt(), 2);
-        $this->lmeData = round((float)(new LmeParser())->makeIt(), 2);
+        $fileNames = ['lme', 'lme_average', 'minfin', 'minfin_average'];
+        $storeManager = new StoreManager();
+        $values = [];
+
+        foreach ($fileNames as $fileName) {
+            $values[$fileName] = $storeManager->fetchFromStore($fileName, 1, 'csv')[0]['value'];
+        }
+
+        $this->currentLme = (float)$values['lme'];
+        $this->averageLme = (float)$values['lme_average'];
+        $this->currentMinfin = (float)$values['minfin'];
+        $this->averageMinfin = (float)$values['minfin_average'];
     }
 
     /**
      * Формула "Лом"
      * @return int|float
      */
-    public function wasteFormula()
+    public function scrapFormula($averageLme, $averageMinfin)
     {
-        return ($this->lmeData + 250) * $this->minfinData * 1.2 * 0.9 - 22000;
+        return round(($averageLme + 250) * $averageMinfin * 1.2 * 0.9 - 22000, 3);
     }
 
     /**
      * Формула "б/н"
      * @return int/float
      */
-    public function bnFormula()
+    public function bnFormula($averageLme, $averageMinfin)
     {
-        return ($this->lmeData + 250) * $this->minfinData * 1.2;
+        return round(($averageLme + 250) * $averageMinfin * 1.2, 3);
     }
 
     /**
      * Формула "cash"
      * @return int/float
      */
-    public function cashFormula()
+    public function cashFormula($averageLme, $averageMinfin)
     {
-        $part = ($this->lmeData + 250) * $this->minfinData * 1.2;
-        return $part - $part * 0.1;
+        return round(($averageLme + 250) * $averageMinfin * 1.2 * 0.9, 3);
     }
 
     /**
@@ -52,6 +59,6 @@ class Renderer
      */
     public function render()
     {
-        return $this->wasteFormula();
+
     }
 }
