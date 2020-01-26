@@ -70,42 +70,59 @@ class StoreManager
 
     }
 
-    public function updateMainStore(string $name, float $data, string $extension = 'csv')
+    /**
+     * Write data to store such as minfin.csv, lme.csv
+     * @param float $data
+     * @param string $filename
+     * @param string $extension
+     */
+    public function writeToStore(float $data, string $filename, string $extension)
     {
-        $filename = $this->generateFilename($name, $extension);
-        $resource = fopen($filename, 'rt');
-        $data = [];
-        for ($i = 0; $line = fgetcsv($resource, 1000, ','); $i += 1) {
-            $data[] = $line;
-        }
-    }
-
-    public function writeToMainStore()
-    {
-        if (date('D') === 'Sat' || date('D') === 'Sun') {
-            return 0;
-        }
-        $parser = new LmeParser();
-        $data = round((float)$parser->makeIt(), 2);
-        $filename = $this->generateFilename('lme');
-        $resource = fopen($filename, 'a+t');
+        $generateFilename = $this->generateFilename($filename, $extension);
+        $resource = fopen($generateFilename, 'at');
         $timestamp = time();
         $date = date('d:m:Y', $timestamp);
-        $string = "${timestamp},${data},{$date}\n";
-        fwrite($resource, $string, strlen($string));
+        $fields = [$timestamp, $data, $date];
+        fputcsv($resource, $fields);
         fclose($resource);
     }
 
-    public function fetchFromMainStore()
+    public function writeToTempStore(float $data, string $filename, string $extension)
     {
-        $filename = $this->generateFilename('lme');
+        $generateFilename = $this->generateFilename($filename, $extension);
+        $resource = fopen($generateFilename, 'at');
+        $timestamp = time();
+        $date = date('d:m:Y', $timestamp);
+        $fields = [$timestamp, $data, $date];
+        fputcsv($resource, $fields);
+        fclose($resource);
+    }
+
+    /**
+     * Return an needed lines of data.
+     * @param string $filename
+     * @param int | null $numOfLines
+     * @param string $extension
+     * @return array
+     */
+    public function fetchFromStore(string $filename, $numOfLines, string $extension): array
+    {
+        $filename = $this->generateFilename($filename, $extension);
         $resource = fopen($filename, 'rt');
         $data = [];
+
         while (!feof($resource)) {
-            $data[] = fgetcsv($resource, 1000, ',');
+            $current = fgetcsv($resource, 1000, ',');
+
+            if (!empty($current)) {
+                $data[] = $current;
+            }
+            continue;
         }
         fclose($resource);
-        return $data;
+
+        $numOfLines = $numOfLines ?? count($data);
+        return self::reformatData($data, $numOfLines);
     }
 
     /**
@@ -114,9 +131,44 @@ class StoreManager
      * @param string $extension
      * @return string
      */
-    public function generateFilename(string $name, string $extension = 'csv')
+    public function generateFilename(string $name, string $extension): string
     {
         $path = $this->getStorePath();
         return $path . $name . '.' . $extension;
+    }
+
+    public function writeToTest()
+    {
+        $filename = $this->generateFilename('test', 'csv');
+        $content = file_get_contents($filename);
+        $content .= "test \n";
+        $resource = fopen($filename, 'w');
+        fwrite($resource, $content);
+        fclose($resource);
+    }
+
+    /**
+     * Format data accordingly provided attribute
+     */
+    static function reformatData(array $data, int $offset): array
+    {
+        $dataLen = count($data);
+
+        if ($dataLen <= 1) {
+            return [];
+        } elseif ($dataLen <= $offset) {
+            $offset = $dataLen - 1;
+        }
+
+        $arrKeys = array_slice($data, 0, 1)[0];
+        $arrValues = array_slice($data, -($offset));//отрицательное смещение для получения данных c конца
+        $newArr = [];
+
+        foreach ($arrValues as $arrValue) {
+            if (empty($arrValue)) continue;
+            $newArr[] = array_combine($arrKeys, $arrValue);
+        }
+
+        return $newArr;
     }
 }
