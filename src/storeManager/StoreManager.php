@@ -80,7 +80,7 @@ class StoreManager
     {
         $generateFilename = $this->generateFilename($filename, $extension);
         $resource = fopen($generateFilename, 'at');
-        $timestamp = time();
+        $timestamp = time() - 86400;
         $date = date('d:m:Y', $timestamp);
         $fields = [$timestamp, $data, $date];
         fputcsv($resource, $fields);

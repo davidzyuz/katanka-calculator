@@ -60,6 +60,9 @@ class Worker
 
     /**
      * Rebase values from temp store to stable
+     * @param $from
+     * @param $to
+     * @return bool
      */
     public function rebaseToMainStore($from, $to)
     {
