@@ -1,9 +1,9 @@
 <?php
-namespace app\renderer;
+namespace app\calculator;
 
 use app\storeManager\StoreManager;
 
-class Renderer
+class Calculator
 {
     public $currentLme;
     public $averageLme;
@@ -28,30 +28,21 @@ class Renderer
     }
 
     /**
-     * Формула "Лом"
-     * @return int|float
-     */
-    public function scrapFormula($averageLme, $averageMinfin)
-    {
-        return round(($averageLme + 250) * $averageMinfin * 1.2 * 0.9 - 22000, 3);
-    }
-
-    /**
      * Формула "б/н"
      * @return int/float
      */
-    public function bnFormula($averageLme, $averageMinfin)
+    public function bnFormula($averageLme, $averageMinfin, $prize)
     {
-        return round(($averageLme + 250) * $averageMinfin * 1.2, 3);
+        return round(($averageLme + $prize) * $averageMinfin * 1.2, 3);
     }
 
     /**
      * Формула "cash"
      * @return int/float
      */
-    public function cashFormula($averageLme, $averageMinfin)
+    public function cashFormula($averageLme, $averageMinfin, $prize)
     {
-        return round(($averageLme + 250) * $averageMinfin * 1.2 * 0.9, 3);
+        return round(($averageLme + $prize) * $averageMinfin * 1.2 * 0.9, 3);
     }
 
     /**

@@ -5,7 +5,7 @@ namespace app\worker;
 use app\storeManager\StoreManager;
 use app\parser\LmeParser;
 use app\parser\MinfinParser;
-use app\renderer\Renderer;
+use app\calculator\Calculator;
 
 class Worker
 {
@@ -60,9 +60,6 @@ class Worker
 
     /**
      * Rebase values from temp store to stable
-     * @param $from
-     * @param $to
-     * @return bool
      */
     public function rebaseToMainStore($from, $to)
     {
@@ -72,14 +69,13 @@ class Worker
         $tempTimestamp = $tempValue = $tempStored_at = '';
         $result = false;
 
-        foreach ($dataFromTemp as $value) {
-            $tempTimestamp = $value['timestamp'] - self::COOL_DOWN;
-            $tempValue = (float)$value['value'];
-            $tempStored_at = $value['stored_at'];
+        foreach ($dataFromTemp as $currTemp) {
+            $tempTimestamp = $currTemp['timestamp'] - self::COOL_DOWN;
+            $tempValue = (float)$currTemp['value'];
         }
 
-        foreach ($dataFromGeneral as $value) {
-            if ((float)$value['value'] !== $tempValue && $tempTimestamp > $value['timestamp']) {
+        foreach ($dataFromGeneral as $currGen) {
+            if ((float)$currGen['value'] !== $tempValue && $tempTimestamp > $currGen['timestamp']) {
                 $result = true;
             }
         }

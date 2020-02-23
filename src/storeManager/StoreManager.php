@@ -17,6 +17,7 @@ class StoreManager
      * @var string
      */
     private $_storePath;
+    const COOL_DOWN = 86400;
 
     public function __construct()
     {
@@ -47,13 +48,13 @@ class StoreManager
      * @param string $extension
      * @return array|false
      */
-    public function fetchFormulaValues(string $name, string $extension = 'csv')
+    public function fetchFormulaValues()
     {
-        $filename = $filename = $this->generateFilename($name, $extension);
-        $resource = fopen($filename, 'r+t');
-        $keys = [];
+        $generatedFilename = $this->generateFilename('formula_values', 'csv');
+        $resource = fopen($generatedFilename, 'r+t');
         $values = [];
-        for ($i = 0; $line = fgetcsv($resource, 1000, ','); $i += 1) {
+        for ($i = 0; $i <= 1; $i += 1) {
+            $line = fgetcsv($resource, 1000, ',');
             foreach ($line as $item) {
                 $i === 0
                     ? $keys[] = $item
@@ -65,9 +66,27 @@ class StoreManager
     }
 
     //TODO заделать возможность апдейтить данные формул
-    public function updateFormulaValues(string $name, array $newValues)
+    public function updateFormulaValues(array $data, string $filename, string $extension)
     {
-
+        $storedData = $this->fetchFormulaValues();
+        $generatedFilename = $this->generateFilename($filename, $extension);
+        $resource = fopen($generatedFilename, 'wt');
+//        //TODO: сделать код ниже универсальным
+        $storedData['prize'] = $data['prize'];
+        $keys = array_keys($storedData);
+        $values = array_values($storedData);
+        $content = array_reduce($keys, function ($acc, $elem) {
+            return $acc .= ($elem . ',');
+        }, '');
+        $content = rtrim($content, ',');
+        $content .= "\n";
+        $content .= array_reduce($values, function ($acc, $elem) {
+            return $acc .= ($elem . ',');
+        }, '');
+        $content = rtrim($content, ',');
+        $content .= "\n";
+        fwrite($resource, $content, strlen($content));
+        fclose($resource);
     }
 
     /**
@@ -80,8 +99,10 @@ class StoreManager
     {
         $generateFilename = $this->generateFilename($filename, $extension);
         $resource = fopen($generateFilename, 'at');
-        $timestamp = time() - 86400;
-        $date = date('d:m:Y', $timestamp);
+        $scheduledAt = '07:59:59';
+        $date = date('d-m-Y', time() - self::COOL_DOWN);
+        $scheduledFullString = $date . ' ' . $scheduledAt;
+        $timestamp = strtotime($scheduledFullString);
         $fields = [$timestamp, $data, $date];
         fputcsv($resource, $fields);
         fclose($resource);
@@ -91,8 +112,8 @@ class StoreManager
     {
         $generateFilename = $this->generateFilename($filename, $extension);
         $resource = fopen($generateFilename, 'at');
-        $timestamp = time();
-        $date = date('d:m:Y', $timestamp);
+        $timestamp = time() - self::COOL_DOWN;
+        $date = date('d-m-Y', $timestamp);
         $fields = [$timestamp, $data, $date];
         fputcsv($resource, $fields);
         fclose($resource);
