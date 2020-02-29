@@ -9,6 +9,8 @@ class Calculator
     public $averageLme;
     public $currentMinfin;
     public $averageMinfin;
+    public $storedLmeDate;
+    public $storedMinfinDate;
     //TODO: добавить сюда переменные формул
 
     public function __construct()
@@ -18,7 +20,20 @@ class Calculator
         $values = [];
 
         foreach ($fileNames as $fileName) {
-            $values[$fileName] = $storeManager->fetchFromStore($fileName, 1, 'csv')[0]['value'];
+            $arr = $storeManager->fetchFromStore($fileName, 1, 'csv')[0];
+            $values[$fileName] = $arr['value'];
+
+            switch ($fileName) {
+                case 'lme':
+                    $this->storedLmeDate = $arr['stored_at'];
+                    break;
+
+                case 'minfin':
+                    $this->storedMinfinDate = $arr['stored_at'];
+                    break;
+
+                default: continue;
+            }
         }
 
         $this->currentLme = (float)$values['lme'];

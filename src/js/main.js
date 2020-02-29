@@ -4,14 +4,18 @@ $(document).ready(function () {
     const xhtp = new XMLHttpRequest();
 
     function render(evObj, responseData) {
-        const jsonObj = JSON.parse(responseData);
-        const nodePrize = document.querySelectorAll("input[name='prize']")
-        const arrPrize = [...nodePrize];
-        const bnValue = document.querySelector('.bn-value');
-        const cashValue = document.querySelector('.cash-value');
+        const jsonObj = JSON.parse(responseData),
+              nodePrize = document.querySelectorAll("input[name='prize']"),
+              arrPrize = [...nodePrize],
+              bnValue = document.querySelectorAll('.bn-value'),
+              cashValue = document.querySelector('.cash-value');
+
         arrPrize.map((el) => el.value = jsonObj.prize);
-        bnValue.innerHTML = Math.round(jsonObj.bn);
-        cashValue.innerHTML = Math.round(jsonObj.cash);
+
+        [...bnValue].map(el => {
+            el.innerHTML = Math.round(jsonObj.bn).toLocaleString().replace(',', ' ');
+        });
+        cashValue.innerHTML = Math.round(jsonObj.cash).toLocaleString().replace(',', ' ');
     }
 
     function handleResponce(e) {
@@ -44,11 +48,14 @@ $(document).ready(function () {
             const jsonObj = JSON.parse(responce);
             const nodePrize = document.querySelectorAll("input[name='prize']");
             const arrPrize = [...nodePrize];
-            const bnValue = document.querySelector('.bn-value');
+            const bnValue = document.querySelectorAll('.bn-value');
             const cashValue = document.querySelector('.cash-value');
             arrPrize.map((el) => el.value = jsonObj.prize);
-            bnValue.innerHTML = Math.round(jsonObj.bn);
-            cashValue.innerHTML = Math.round(jsonObj.cash);
+
+            [...bnValue].map(el => {
+                el.innerHTML = Math.round(jsonObj.bn).toLocaleString().replace(',', ' ');
+            });
+            cashValue.innerHTML = Math.round(jsonObj.cash).toLocaleString().replace(',', ' ');
         }
 
         function handleResponce() {

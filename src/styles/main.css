@@ -1,3 +1,10 @@
 input[name='prize'] {
     width: 45px;
 }
+
+#chart_div {
+    margin: 0 auto;
+    margin-top: 60px;
+    width: 1000px;
+    height: 500px;
+}

@@ -32,7 +32,9 @@ class LmeParser extends Parser
     public function fetchData()
     {
         $client = new Client();
-        $this->crawler = $client->request('GET', self::LME_COPPER_URL);
+        $this->crawler = $client->request('GET', self::LME_COPPER_URL, [
+            'Cache-Control' => 'no-cache'
+        ]);
         return $this;
     }
 
