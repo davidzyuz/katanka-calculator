@@ -22,15 +22,12 @@ $calculator = new Calculator();
         href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
         crossorigin="anonymous">
-    <link rel="stylesheet" href="./src/styles/main.css">
-    <script src="./src/js/jquery.min.js"></script>
-    <script src="./src/js/main.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <title>Katanka</title>
 
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="/src/js/google-chart.js"></script>
-
+    <script type="text/javascript" src="/src/assets/main.js"></script>
 </head>
 <body>
 <div class="container">
@@ -41,25 +38,37 @@ $calculator = new Calculator();
         <li>Текущий курс $: <?= $calculator->currentMinfin ?> Данные актуальны на: <?= $calculator->storedMinfinDate ?></li>
     </ul>
 
-    <h3>Цена</h3>
-    <form class="form-inline" action="/controller.php" method="POST" id="bN">
-        <span>
-            (<?= number_format($calculator->averageLme, 2, ',', '') ?> +
-            <input type="text" value="" name="prize"/>)
-            x <?= number_format($calculator->averageMinfin, 3, ',', '') ?>
-        </span>
-        <span>&nbsp;x 1,2 = <span class="bn-value"></span></span>
-    </form>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm">
+                <form action="/controller.php" class="form-inline">
+                    <input type="text" class="datepicker">
+                </form>
+                <button id="foo-btn">click</button>
+            </div>
 
-    <h3>Цена -10%</h3>
-    <form class="form-inline" action="" method="POST">
-        <span class="bn-value">
-        </span>
-        <span>&nbsp;- 10% = <span class="cash-value"></span></span>
-    </form>
+            <div class="col-sm">
+                <h3>Цена</h3>
+                <form class="form-inline" action="/controller.php" method="POST" id="bN">
+            <span>
+                (<?= number_format($calculator->averageLme, 2, ',', '') ?> +
+                <input type="text" value="" name="prize"/>)
+                x <?= number_format($calculator->averageMinfin, 3, ',', '') ?>
+            </span>
+                    <span>&nbsp;x 1,2 = <span class="bn-value"></span></span>
+                </form>
+            </div>
+
+            <div class="col-sm">
+                <h3>Цена -10%</h3>
+            <span class="bn-value">
+            </span>
+                    <span>&nbsp;- 10% = <span class="cash-value"></span></span>
+            </div>
+        </div>
+    </div>
 
 </div>
-
 <div id="chart_div"></div>
 </body>
 </html>

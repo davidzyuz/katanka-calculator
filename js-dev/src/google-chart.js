@@ -1,6 +1,3 @@
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(drawChart);
-
 let chartData;
 
 function setChartData(data) {
@@ -59,4 +56,9 @@ function drawChart() {
   const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
 
   chart.draw(data, options);
+}
+
+export function requestChartData() {
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawChart);
 }
