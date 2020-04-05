@@ -7,9 +7,6 @@ class LmeParser extends Parser
 {
     public $crawler;
     public $haystack;
-   /* TODO: заделать возможность передачи кастомного индекса
-     * для получения нужного параметра через $valueIndex
-   */
     public $valueIndex;
     private $_needle;
 
@@ -32,6 +29,9 @@ class LmeParser extends Parser
     public function fetchData()
     {
         $client = new Client();
+        $client->setHeader('Cache-Control', 'no-cache');
+        $client->setHeader('Clear-Site-Data', '*');
+        $client->setHeader('Cookie', 'foo');
         $this->crawler = $client->request('GET', self::LME_COPPER_URL);
         return $this;
     }

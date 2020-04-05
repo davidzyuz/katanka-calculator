@@ -71,7 +71,7 @@ class StoreManager
         $storedData = $this->fetchFormulaValues();
         $generatedFilename = $this->generateFilename($filename, $extension);
         $resource = fopen($generatedFilename, 'wt');
-//        //TODO: сделать код ниже универсальным
+        //TODO: сделать код ниже универсальным
         $storedData['prize'] = $data['prize'];
         $keys = array_keys($storedData);
         $values = array_values($storedData);
@@ -108,6 +108,12 @@ class StoreManager
         fclose($resource);
     }
 
+    /**
+     * Writes fetched data to temporary store
+     * @param float $data
+     * @param string $filename
+     * @param string $extension
+     */
     public function writeToTempStore(float $data, string $filename, string $extension)
     {
         $generateFilename = $this->generateFilename($filename, $extension);
@@ -126,7 +132,7 @@ class StoreManager
      * @param string $extension
      * @return array
      */
-    public function fetchFromStore(string $filename, $numOfLines, string $extension): array
+    public function fetchFromStore(string $filename, $numOfLines = null, string $extension = 'csv'): array
     {
         $filename = $this->generateFilename($filename, $extension);
         $resource = fopen($filename, 'rt');
@@ -170,6 +176,9 @@ class StoreManager
 
     /**
      * Format data accordingly provided attribute
+     * @param array $data
+     * @param int $offset
+     * @return array
      */
     static function reformatData(array $data, int $offset): array
     {
