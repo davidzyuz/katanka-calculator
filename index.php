@@ -41,10 +41,9 @@ $calculator = new Calculator();
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm">
-                <form action="/controller.php" class="form-inline">
+                <form action="/controller.php">
                     <input type="text" class="datepicker">
                 </form>
-                <button id="foo-btn">click</button>
             </div>
 
             <div class="col-sm">

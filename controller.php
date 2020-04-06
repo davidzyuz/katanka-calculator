@@ -7,6 +7,7 @@ error_reporting(E_ALL);
 
 use app\calculator\Calculator;
 use app\controller\Controller;
+use app\datepicker\Datepicker;
 
 $calculator = new Calculator();
 $controller = new Controller();
@@ -22,6 +23,11 @@ switch($action) {
 
     case 'fetch_chart_data':
         echo trim(json_encode($controller->fetchChartData(), 0, 512));
+        break;
+
+    case 'datepicker':
+        $datepicker = new Datepicker('29-01-2020');
+        echo trim(json_encode($datepicker->specificLme, 0, 512));
         break;
 
     default:

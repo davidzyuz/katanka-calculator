@@ -1,16 +1,23 @@
-export default class Fetch {
+export default class FetchApi {
   constructor() {
     this._baseUrl = '/controller.php';
+    this._data = null;
   }
 
-  async getResource() {
-    const res = await fetch(this._baseUrl, {
+  async getResource(opts) {
+    this._data = {'action': 'foo'};
+    const res = await fetch(this._baseUrl, opts);
+
+    return await res.json();
+  }
+
+  async datePickerAction() {
+    return await this.getResource({
       method: 'POST',
       headers: {
-        'action': 'foo'
-      }
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'action=datepicker'
     });
-    console.log(res);
-    return await res.json();
   }
 }
