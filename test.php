@@ -7,7 +7,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use app\datepicker\Datepicker;
 
-$datepicker = new Datepicker('29-01-2020');
+$datepicker = new Datepicker('');
 echo '<pre>';
 print_r($datepicker->specificLme);
 print_r($datepicker->specificLmeAverage);

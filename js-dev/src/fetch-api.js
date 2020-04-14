@@ -5,19 +5,18 @@ export default class FetchApi {
   }
 
   async getResource(opts) {
-    this._data = {'action': 'foo'};
     const res = await fetch(this._baseUrl, opts);
 
-    return await res.json();
+    return res.json();
   }
 
-  async datePickerAction() {
-    return await this.getResource({
+  async sendDatePickerAction(date) {
+    return this.getResource({
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: 'action=datepicker'
+      body: `action=datepicker&date=${date}`
     });
   }
 }

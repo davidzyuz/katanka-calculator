@@ -6,8 +6,6 @@ use app\calculator\Calculator;
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-
-$calculator = new Calculator();
 ?>
 
 <!doctype html>
@@ -34,26 +32,30 @@ $calculator = new Calculator();
     <h2>Калькулятор катанки / проволоки</h2>
 
     <ul>
-        <li>Значение меди по LME: <?= $calculator->currentLme ?> Данные актуальны на: <?= $calculator->storedLmeDate ?></li>
-        <li>Текущий курс $: <?= $calculator->currentMinfin ?> Данные актуальны на: <?= $calculator->storedMinfinDate ?></li>
+        <li>Значение меди по LME: <span class="current-lme"></span> Данные актуальны на: <span class="stored-lme-date"></span></li>
+        <li>Текущий курс $: <span class="current-minfin"></span> Данные актуальны на: <span class="stored-minfin-date"></span></li>
     </ul>
 
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm">
                 <form action="/controller.php">
-                    <input type="text" class="datepicker">
+                    <input type="text" class="datepicker" placeholder="Выбрать дату">
                 </form>
             </div>
 
             <div class="col-sm">
                 <h3>Цена</h3>
                 <form class="form-inline" action="/controller.php" method="POST" id="bN">
-            <span>
-                (<?= number_format($calculator->averageLme, 2, ',', '') ?> +
-                <input type="text" value="" name="prize"/>)
-                x <?= number_format($calculator->averageMinfin, 3, ',', '') ?>
-            </span>
+            <div>
+                <span class="open-bracket">(</span>
+                <span class="average-lme"></span>
+                <span class="plus-sign">+</span>
+                <input type="text" value="" name="prize"/>
+                <span class="close-bracket">)</span>
+                <span>x</span>
+                <span class="average-minfin"></span>
+            </div>
                     <span>&nbsp;x 1,2 = <span class="bn-value"></span></span>
                 </form>
             </div>

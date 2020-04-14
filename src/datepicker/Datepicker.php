@@ -2,6 +2,7 @@
 
 namespace app\datepicker;
 
+use app\calculator\Calculator;
 use app\storeManager\StoreManager;
 
 class Datepicker
@@ -89,18 +90,64 @@ class Datepicker
      * @param array $data
      * @return array
      */
-    public function findSpecific(array $data)
+    private function findSpecific(array $data)
     {
         return array_filter($data, function ($el) {
             return in_array($this->_searchTarget, $el);
         });
     }
 
+    /**
+     * Generates a specific prop name.
+     * @param string $storeName
+     * @return string
+     */
+    private function generateSpecificPropName(string $storeName): string
+    {
+        return 'specific' . ucfirst($storeName);
+    }
+
+    /**
+     * Populates specific properties, such as specificLme and other.
+     */
     public function populateSpecific()
     {
         array_map(function ($store) {
-            $specificStore = 'specific' . ucfirst($store);
+            $specificStore = $this->generateSpecificPropName($store);
             $this->$specificStore = $this->findSpecific($this->$store);
         }, $this->_stores);
+    }
+
+    /**
+     * Array of all requested concrete values
+     * @return mixed
+     */
+    public function getAllSpecificValues()
+    {
+        $data =  array_reduce($this->_stores, function($acc, $curr) {
+            $specificStore = $this->generateSpecificPropName($curr);
+            foreach ($this->$specificStore as $batchData) {
+                foreach ($batchData as $key => $value) {
+                    $acc[$curr][$key] = $value;
+                }
+            }
+            return $acc;
+        }, []);
+
+        $store = new StoreManager();
+        $calc = new Calculator();
+        $formulaValues = $store->fetchFormulaValues();
+        $data['bnValue'] = $calc->bnFormula(
+            $data['lmeAverage']['value'],
+            $data['minfinAverage']['value'],
+            $formulaValues['prize']
+        );
+        $data['cashValue'] = $calc->cashFormula(
+            $data['lmeAverage']['value'],
+            $data['minfinAverage']['value'],
+            $formulaValues['prize']
+        );
+
+        return $data;
     }
 }

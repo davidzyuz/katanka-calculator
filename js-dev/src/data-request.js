@@ -48,22 +48,37 @@ export function makeRequest() {
 
     function init() {
       function render(responce) {
-        const jsonObj = JSON.parse(responce);
-        const nodePrize = document.querySelectorAll("input[name='prize']");
-        const arrPrize = [...nodePrize];
-        const bnValue = document.querySelectorAll('.bn-value');
-        const cashValue = document.querySelector('.cash-value');
+        const jsonObj = JSON.parse(responce),
+          nodePrize = document.querySelectorAll("input[name='prize']"),
+          arrPrize = [...nodePrize],
+          bnValue = document.querySelectorAll('.bn-value'),
+          cashValue = document.querySelector('.cash-value'),
+          averLme = document.querySelector('.average-lme'),
+          averMinfin = document.querySelector('.average-minfin'),
+          currMinfin = document.querySelector('.current-minfin'),
+          currLme = document.querySelector('.current-lme'),
+          lmeDate = document.querySelector('.stored-lme-date'),
+          minfinDate = document.querySelector('.stored-minfin-date');
+
+
         arrPrize.map((el) => el.value = jsonObj.prize);
 
         [...bnValue].map(el => {
           el.innerHTML = Math.round(jsonObj.bn).toLocaleString().replace(',', ' ');
         });
         cashValue.innerHTML = Math.round(jsonObj.cash).toLocaleString().replace(',', ' ');
+        averLme.innerHTML = new Number(jsonObj.lmeAverage).toFixed(2);
+        averMinfin.innerHTML = new Intl.NumberFormat('ru-RU').format(jsonObj.minfinAverage);
+        currMinfin.innerHTML = new Intl.NumberFormat('ru-RU').format(jsonObj.currentMinfin);
+        currLme.innerHTML = new Intl.NumberFormat('ru-RU').format(jsonObj.currentLme);
+        lmeDate.innerHTML = jsonObj.storedLmeDate;
+        minfinDate.innerHTML = jsonObj.storedMinfinDate;
       }
 
       function handleResponce() {
         if (xhtp.readyState === 4 && xhtp.status === 200) {
-          const {responseText: responseText} = xhtp;
+          const { responseText } = xhtp;
+
           render(responseText);
         }
       }

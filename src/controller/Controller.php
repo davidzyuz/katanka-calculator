@@ -2,12 +2,13 @@
 
 namespace app\controller;
 
+use app\datepicker\Datepicker;
 use app\storeManager\StoreManager;
 use app\calculator\Calculator;
 
 class Controller
 {
-    public function update(array $data)
+    public function updateAction(array $data)
     {
         $store = new StoreManager();
         $calc = new Calculator();
@@ -19,13 +20,19 @@ class Controller
         return $responseData;
     }
 
-    public function init()
+    public function indexAction()
     {
         $store = new StoreManager();
         $calc = new Calculator();
         $responseData = $store->fetchFormulaValues();
         $responseData['bn'] = $calc->bnFormula($calc->averageLme, $calc->averageMinfin, $responseData['prize']);
         $responseData['cash'] = $calc->cashFormula($calc->averageLme, $calc->averageMinfin, $responseData['prize']);
+        $responseData['lmeAverage'] = $calc->averageLme;
+        $responseData['minfinAverage'] = $calc->averageMinfin;
+        $responseData['currentLme'] = $calc->currentLme;
+        $responseData['currentMinfin'] = $calc->currentMinfin;
+        $responseData['storedLmeDate'] = $calc->storedLmeDate;
+        $responseData['storedMinfinDate'] = $calc->storedMinfinDate;
 
         return $responseData;
     }
@@ -34,7 +41,7 @@ class Controller
      * Calculated cash and bn formula values
      * @return array;
      */
-    public function fetchChartData()
+    public function fetchChartDataAction()
     {
         $store = new StoreManager();
 
@@ -70,5 +77,16 @@ class Controller
         }
 
         return $responseData;
+    }
+
+    /**
+     * Pick a specific date from store
+     * @return array
+     */
+    public function datepickerAction():array
+    {
+        $date = $_POST['date'];
+        $datepicker = new Datepicker($date);
+        return $datepicker->getAllSpecificValues();
     }
 }
