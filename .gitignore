@@ -5,3 +5,4 @@ src/store
 src/assets
 js-dev/node_modules
 test.php
+logs

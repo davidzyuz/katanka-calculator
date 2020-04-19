@@ -25,7 +25,15 @@ switch($action) {
         echo trim(json_encode($controller->datepickerAction(), 0, 512));
         break;
 
-    default:
+    case 'test':
+        echo trim(json_encode('hello from test'));
+        break;
+
+    case 'init':
         echo trim(json_encode($controller->indexAction(), 0, 512));
+        break;
+
+    default:
+        throw new Exception('Invalid action');
         break;
 }
