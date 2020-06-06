@@ -163,7 +163,7 @@ class StoreManager
         fclose($resource);
 
         $numOfLines = $numOfLines ?? count($data);
-        return $this->reformatData($data, $numOfLines);
+        return $this->reformatData($data, $numOfLines, $filename);
     }
 
     /**
@@ -196,35 +196,38 @@ class StoreManager
      * @return array
      */
     private function _uniqueMultidimArray($array, $key) {
-        $tempArray = [];
-        $keyArray = [];
-        $repeatedLastKey = [];
-
-        foreach($array as $val) {
-            if (!in_array($val[$key], $keyArray)) {
-                $keyArray[] = $val[$key];
-                $tempArray[] = $val;
-
-                // TODO: не записывает последнюю дату в массив. Работает криво
-                if (!empty($repeatedLastKey) && !empty($tempArray)) {
-                    $last = key(array_slice($tempArray, -1, 1, true));
-                    $tempArray[$last] = $repeatedLastKey;
-                    $repeatedLastKey = [];
-                }
-            } else {
-                $repeatedLastKey = $val;
+        $result = [];
+        foreach ($array as $k => $set) {
+            if (!isset($temp)) {
+                $temp = $set;
+                continue; //пропускаем первую итерацию, инициализируем $temp
             }
+
+            if ($set[$key] !== $temp[$key]) {
+                $result[] = $temp;
+            }
+
+            $temp = $set;
         }
-        return $tempArray;
+
+        $last = count($result) - 1;
+
+        if ($result[$last][$key] === $temp[$key]) {
+            $result[$last] = $temp;
+        } else {
+            $result[] = $temp;
+        }
+        return $result;
     }
 
     /**
      * Format data accordingly provided attribute
      * @param array $data
      * @param int $offset
+     * @param string $filename
      * @return array
      */
-    public function reformatData(array $data, int $offset): array
+    public function reformatData(array $data, int $offset, string $filename): array
     {
         $dataLen = count($data);
 
@@ -233,8 +236,6 @@ class StoreManager
         } elseif ($dataLen <= $offset) {
             $offset = $dataLen - 1;
         }
-
-        $arrKeys = array_slice($data, 0, 1)[0];
 
         // отсекаем элемент массива с ключами
         $filteredData = array_slice($data, 1);
@@ -257,15 +258,16 @@ class StoreManager
         }
         // Конец логики выше. TODO: вынести в метод.
 
-        // Фильтруем повторяющиеся средние значения. Массив вида [0 => [0 => timestamp, 1 => value, 2 => date]];
-        $filteredData = $this->_uniqueMultidimArray($filteredData, 1);
-        var_dump($filteredData);
-        die();
+        if (strripos($filename, 'lme_average') !== false || strripos($filename, 'minfin_average') !== false) {
+            // Фильтруем повторяющиеся средние значения. Массив вида [0 => [0 => timestamp, 1 => value, 2 => date]];
+            $filteredData = $this->_uniqueMultidimArray($filteredData, 1);
+        }
 
         //отрицательное смещение для получения данных c конца
         $arrValues = array_slice($filteredData, -($offset));
         $newArr = [];
 
+        $arrKeys = array_slice($data, 0, 1)[0];
         foreach ($arrValues as $arrValue) {
             if (empty($arrValue)) continue;
             $newArr[] = array_combine($arrKeys, $arrValue);

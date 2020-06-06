@@ -58,6 +58,7 @@ export default function (props) {
     <div>
       <MainPrice {...props} prizeChangeEvent={props.prizeChangeEvent} />
       <PriceWithDiscount bn={props.bn} cash={props.cash}/>
+      <PriceWithDiscount bn={props.bn} cash={props.cash}/>
     </div>
   );
 }
