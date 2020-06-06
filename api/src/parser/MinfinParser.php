@@ -7,9 +7,6 @@ class MinfinParser extends Parser
 {
     public $crawler;
     public $haystack;
-    /* TODO: заделать возможность передачи кастомного индекса
-      * для получения нужного параметра через $valueIndex
-    */
     public $valueIndex;
     private $_needle;
 

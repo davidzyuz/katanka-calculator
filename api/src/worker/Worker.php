@@ -5,7 +5,6 @@ namespace app\worker;
 use app\storeManager\StoreManager;
 use app\parser\LmeParser;
 use app\parser\MinfinParser;
-use app\calculator\Calculator;
 
 class Worker
 {
@@ -21,6 +20,9 @@ class Worker
     public $scrapFormulaValue;
     public $cashFormulaValue;
 
+    /** @var StoreManager */
+    protected $_storeManager;
+
     /**
      * Fetch data. General abstraction to fetching data.
      */
@@ -30,6 +32,7 @@ class Worker
         $minfinParser = new MinfinParser();
         $this->lmeData = round((float)$lmeParser->makeIt(), 3);
         $this->minfinData = round((float)$minfinParser->makeIt(), 3);
+        $this->_storeManager = new StoreManager();
     }
 
     /**
@@ -43,8 +46,7 @@ class Worker
      */
     public function writeToStore($data, string $filename, $numOfLines = null, string $extension = 'csv'): bool
     {
-        $storeManager = new StoreManager();
-        $storedData = $storeManager->fetchFromStore($filename, $numOfLines, $extension);
+        $storedData = $this->_storeManager->fetchFromStore($filename, $numOfLines, $extension);
 
         foreach ($storedData as $value) {
             $currentDate = date('d:m:Y');
@@ -54,7 +56,7 @@ class Worker
                 return false;
             }
         }
-        $storeManager->writeToStore($data, $filename, $extension);
+        $this->_storeManager->writeToStore($data, $filename, $extension);
         return true;
     }
 
@@ -63,9 +65,8 @@ class Worker
      */
     public function rebaseToMainStore($from, $to)
     {
-        $storeManager = new StoreManager();
-        $dataFromTemp = $storeManager->fetchFromStore($from, 1, 'csv');
-        $dataFromGeneral = $storeManager->fetchFromStore($to, 1, 'csv');
+        $dataFromTemp = $this->_storeManager->fetchFromStore($from, 1, 'csv');
+        $dataFromGeneral = $this->_storeManager->fetchFromStore($to, 1, 'csv');
         $tempTimestamp = $tempValue = $tempStored_at = '';
         $result = false;
 
@@ -75,13 +76,17 @@ class Worker
         }
 
         foreach ($dataFromGeneral as $currGen) {
-            if ((float)$currGen['value'] !== $tempValue && $tempTimestamp > $currGen['timestamp']) {
+            if (
+                ((float)$currGen['value'] !== $tempValue) &&
+                ($tempTimestamp > $currGen['timestamp']) &&
+                ((int)$tempValue !== 0)
+            ) {
                 $result = true;
             }
         }
 
         if ($result) {
-            $storeManager->writeToStore($tempValue, $to, 'csv');
+            $this->_storeManager->writeToStore($tempValue, $to, 'csv');
         }
 
         return $result;
@@ -109,8 +114,7 @@ class Worker
                 return false;
         }
 
-        $storeManager = new StoreManager();
-        $data = $storeManager->fetchFromStore($filename, $numOfLines, $extension);
+        $data = $this->_storeManager->fetchFromStore($filename, $numOfLines, $extension);
         $sum = array_reduce($data, function ($init, $current) {
             return $init + $current['value'];
         }, 0);
@@ -158,8 +162,7 @@ class Worker
 
     public function writeToTemp(float $data, string $filename)
     {
-        $storeManager = new StoreManager();
-        $storeManager->writeToTempStore($data, $filename, 'csv');
+        $this->_storeManager->writeToTempStore($data, $filename, 'csv');
     }
 
     /**
@@ -170,9 +173,16 @@ class Worker
         
     }
 
-    public function writeTest()
+    /**
+     * Rewrite average data
+     *
+     * @param $type
+     */
+    public function rewriteAverage($type)
     {
-        $storeManager = new StoreManager();
-        $storeManager->writeToTest();
+        switch ($type) {
+            case self::LME_TYPE:
+                $lastLine = $this->_storeManager->fetchFromStore('lme_average', 1);
+        }
     }
 }

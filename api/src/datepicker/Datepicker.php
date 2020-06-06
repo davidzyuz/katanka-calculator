@@ -7,6 +7,9 @@ use app\storeManager\StoreManager;
 
 class Datepicker
 {
+
+    // TODO: фильтр повторяющихся значений для средних лме и валюты
+    // TODO: брать близжайшее лме или валюту, если на указанную дату данных нет
     public $specificLme;
     public $specificLmeAverage;
     public $specificMinfin;
@@ -92,9 +95,20 @@ class Datepicker
      */
     private function findSpecific(array $data)
     {
-        return array_filter($data, function ($el) {
-            return in_array($this->_searchTarget, $el);
-        });
+        $date = new \DateTime($this->_searchTarget);
+        $specific = [];
+        $condition = true;
+
+        while ($condition) {
+            $format = $date->format('d-m-Y');
+            $specific = array_filter($data, function ($el) use ($format) {
+                return in_array($format, $el);
+            });
+
+            empty($specific) ? $date->modify('-1 day') : $condition = false;
+        }
+
+        return $specific;
     }
 
     /**

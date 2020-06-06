@@ -14,10 +14,10 @@ $data = [];
 
 switch($action) {
     case 'update':
-        echo trim(json_encode($controller->updateAction($_POST), 0, 512));
+        echo trim(json_encode($controller->updateAction(), 0, 512));
         break;
 
-    case 'fetch_chart_data':
+    case 'chart_data':
         echo trim(json_encode($controller->fetchChartDataAction(), 0, 512));
         break;
 

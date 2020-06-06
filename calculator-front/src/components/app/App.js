@@ -1,45 +1,113 @@
-import React, { useState } from 'react';
-import Header from "../header/Header";
-import Api from "../../api/Api";
+import React, {useState, useEffect, Fragment} from 'react';
+import Header from "../header";
+import PriceInfo from "../price-info";
+import Datepicker from "../datepicker";
+import Chart from "../chart";
+import Api from "../../api";
+import {registerLocale, setDefaultLocale} from "react-datepicker";
+import ru from "date-fns/locale/ru";
 
-export default function App() {
-    const api = new Api(),
-        [apiData, setApiData] = useState({
-            prize: null,
-            firstVar: null,
-            secondVar: null,
-            bn: null,
-            cash: null,
-            lmeAverage: null,
-            minfinAverage: null,
-            currentLme: null,
-            currentMinfin: null,
-            storedLmeDate: null,
-            storedMinfinDate: null
+registerLocale('ru', ru);
+setDefaultLocale('ru')
+
+export default function () {
+  const api = new Api(),
+    [action, setAction] = useState('init'),
+    [wasUpdated, setWasUpdated] = useState(true),
+    [initData, setInitData] = useState({}),
+    [updateData, setUpdateData] = useState({}),
+    [chartData, setChartData] = useState({}),
+    [datepickerData, setDatepickerData] = useState({});
+
+  /* TODO: сдeлaть так, чтобы update ничего не возвращал, (кроме успешного сообщения), а после update -> отправлять еще
+   * один запрос на init, который вернёт уже новые данные.
+   **/
+  // Available actions: init, update, chart_data, datepicker, test
+
+
+  useEffect(() => {
+    api.performAction(action)
+      .then(data => {
+        console.log('first data:', data);
+        switch(action) {
+          case 'init':
+            const { first_var: firstVar, second_var: secondVar } = data;
+            setInitData({firstVar, secondVar, ...data});
+            break;
+
+          case 'update':
+            setUpdateData({...data});
+            break;
+
+          case 'chart_data':
+            setChartData([...data]);
+            break;
+
+          case 'datepicker':
+            setDatepickerData({...data});
+            break;
+
+          default:
+            break;
+        }
+      })
+      .catch(error => console.error(error));
+
+    setWasUpdated(false);
+  }, [action, wasUpdated]);
+
+  function chartEvent() {
+    setAction('chart_data');
+  }
+
+  /**
+   * Event that fires on prize change
+   * @param action
+   * @param params object
+   */
+  function prizeChangeEvent(action, params) {
+    api.performAction(action, params)
+      .then(data => {
+        if (data.status.ok) {
+          setWasUpdated(true);
+          setAction('init');
+        }
+      })
+      .catch(error => console.error(error));
+  }
+
+  function datepickerChangeEvent(action, params) {
+    api.performAction(action, params)
+      .then(data => {
+        setInitData(prevData => {
+          const { prize, firstVar, secondVar } = prevData,
+            { bnValue: bn, cashValue: cash } = data,
+            lmeAverage = data.lmeAverage.value,
+            minfinAverage = data.minfinAverage.value,
+            currentLme = data.lme.value,
+            storedLmeDate = data.lme.stored_at,
+            currentMinfin = data.minfin.value,
+            storedMinfinDate = data.minfin.stored_at;
+
+          return { prize, firstVar, secondVar, bn, cash, lmeAverage, minfinAverage, currentLme, storedLmeDate, currentMinfin, storedMinfinDate };
         });
+      })
+      .catch(error => console.error(error));
 
-    api.initAction()
-        .then(data => {
-            console.log(data);
-            setApiData({
-            prize: data.prize,
-            firstVar: data.first_var,
-            secondVar: data.second_var,
-            bn: null,
-            cash: null,
-            lmeAverage: null,
-            minfinAverage: null,
-            currentLme: null,
-            currentMinfin: null,
-            storedLmeDate: null,
-            storedMinfinDate: null
-            });
-        })
-        .catch(error => console.error(error));
+    api.performAction('chart_data', params)
+      .then(data => {
+        console.log('')
+        setChartData([...data]);
+      })
+      .catch(error => console.error(error));
+  }
 
-    return (
-        <div>
-            <Header />
-        </div>
-    )
+  return (
+    <Fragment>
+      <Header {...initData} />
+      <PriceInfo {...initData} prizeChangeEvent={prizeChangeEvent}/>
+      <Datepicker datepickerChangeEvent={datepickerChangeEvent}/>
+      <Chart chartEvent={chartEvent} chartData={chartData}/>
+    </Fragment>
+  );
 }

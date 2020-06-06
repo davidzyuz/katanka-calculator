@@ -12,16 +12,26 @@ use app\parser\MinfinParser;
  */
 class StoreManager
 {
+    const COOL_DOWN = 86400;
+
     /**
-     * Path to store
+     * Path to store.
+     *
      * @var string
      */
     private $_storePath;
-    const COOL_DOWN = 86400;
 
-    public function __construct()
+    /**
+     * Last date for chart.
+     * @var string
+     */
+    private $_criteriaDate;
+
+    public function __construct($date = null)
     {
         $this->_storePath = dirname(__DIR__) . '/store/';
+
+        $this->_criteriaDate = $date;
     }
 
     /**
@@ -51,7 +61,7 @@ class StoreManager
     public function fetchFormulaValues()
     {
         $generatedFilename = $this->generateFilename('formula_values', 'csv');
-        $resource = fopen($generatedFilename, 'r+t');
+        $resource = fopen($generatedFilename, 'rt');
         $values = [];
         for ($i = 0; $i <= 1; $i += 1) {
             $line = fgetcsv($resource, 1000, ',');
@@ -65,14 +75,12 @@ class StoreManager
         return array_combine($keys, $values);
     }
 
-    //TODO заделать возможность апдейтить данные формул
-    public function updateFormulaValues(array $data, string $filename, string $extension)
+    public function updateFormulaValues(string $filename, string $extension)
     {
         $storedData = $this->fetchFormulaValues();
         $generatedFilename = $this->generateFilename($filename, $extension);
         $resource = fopen($generatedFilename, 'wt');
-        //TODO: сделать код ниже универсальным
-        $storedData['prize'] = $data['prize'];
+        $storedData['prize'] = $_POST['prize'];
         $keys = array_keys($storedData);
         $values = array_values($storedData);
         $content = array_reduce($keys, function ($acc, $elem) {
@@ -87,6 +95,8 @@ class StoreManager
         $content .= "\n";
         fwrite($resource, $content, strlen($content));
         fclose($resource);
+
+        return true;
     }
 
     /**
@@ -131,11 +141,15 @@ class StoreManager
      * @param int | null $numOfLines
      * @param string $extension
      * @return array
+     * @throws \Exception
      */
     public function fetchFromStore(string $filename, $numOfLines = null, string $extension = 'csv'): array
     {
         $filename = $this->generateFilename($filename, $extension);
         $resource = fopen($filename, 'rt');
+        if (!$resource) {
+            throw new \Exception('Invalid filename: ' . $filename);
+        }
         $data = [];
 
         while (!feof($resource)) {
@@ -149,7 +163,7 @@ class StoreManager
         fclose($resource);
 
         $numOfLines = $numOfLines ?? count($data);
-        return self::reformatData($data, $numOfLines);
+        return $this->reformatData($data, $numOfLines);
     }
 
     /**
@@ -175,12 +189,42 @@ class StoreManager
     }
 
     /**
+     * Helper method for get unique values from multidimensional array.
+     *
+     * @param $array
+     * @param $key
+     * @return array
+     */
+    private function _uniqueMultidimArray($array, $key) {
+        $tempArray = [];
+        $keyArray = [];
+        $repeatedLastKey = [];
+
+        foreach($array as $val) {
+            if (!in_array($val[$key], $keyArray)) {
+                $keyArray[] = $val[$key];
+                $tempArray[] = $val;
+
+                // TODO: не записывает последнюю дату в массив. Работает криво
+                if (!empty($repeatedLastKey) && !empty($tempArray)) {
+                    $last = key(array_slice($tempArray, -1, 1, true));
+                    $tempArray[$last] = $repeatedLastKey;
+                    $repeatedLastKey = [];
+                }
+            } else {
+                $repeatedLastKey = $val;
+            }
+        }
+        return $tempArray;
+    }
+
+    /**
      * Format data accordingly provided attribute
      * @param array $data
      * @param int $offset
      * @return array
      */
-    static function reformatData(array $data, int $offset): array
+    public function reformatData(array $data, int $offset): array
     {
         $dataLen = count($data);
 
@@ -191,7 +235,35 @@ class StoreManager
         }
 
         $arrKeys = array_slice($data, 0, 1)[0];
-        $arrValues = array_slice($data, -($offset));//отрицательное смещение для получения данных c конца
+
+        // отсекаем элемент массива с ключами
+        $filteredData = array_slice($data, 1);
+
+        // Если есть дата, то обрезаем массив до этой даты включительно.
+        if (isset($this->_criteriaDate)) {
+            foreach ($filteredData as $key => $value) {
+                if (in_array($this->_criteriaDate, $value)) {
+                    $ind = $key;
+                } else {
+                    continue;
+                }
+            }
+        }
+
+        if (isset ($ind)) {
+            $filteredData = array_filter($filteredData, function($key) use ($ind) {
+                return $key <= $ind;
+            }, ARRAY_FILTER_USE_KEY);
+        }
+        // Конец логики выше. TODO: вынести в метод.
+
+        // Фильтруем повторяющиеся средние значения. Массив вида [0 => [0 => timestamp, 1 => value, 2 => date]];
+        $filteredData = $this->_uniqueMultidimArray($filteredData, 1);
+        var_dump($filteredData);
+        die();
+
+        //отрицательное смещение для получения данных c конца
+        $arrValues = array_slice($filteredData, -($offset));
         $newArr = [];
 
         foreach ($arrValues as $arrValue) {

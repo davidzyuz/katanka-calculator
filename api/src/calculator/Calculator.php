@@ -11,7 +11,6 @@ class Calculator
     public $averageMinfin;
     public $storedLmeDate;
     public $storedMinfinDate;
-    //TODO: добавить сюда переменные формул
 
     public function __construct()
     {

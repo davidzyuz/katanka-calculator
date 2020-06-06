@@ -8,16 +8,14 @@ use app\calculator\Calculator;
 
 class Controller
 {
-    public function updateAction(array $data)
+    public function updateAction()
     {
         $store = new StoreManager();
-        $calc = new Calculator();
-        $store->updateFormulaValues($data, 'formula_values', 'csv');
-        $responseData = $store->fetchFormulaValues();
-        $responseData['bn'] = $calc->bnFormula($calc->averageLme, $calc->averageMinfin, $responseData['prize']);
-        $responseData['cash'] = $calc->cashFormula($calc->averageLme, $calc->averageMinfin, $responseData['prize']);
+        $result = $store->updateFormulaValues('formula_values', 'csv');
 
-        return $responseData;
+        return ['status' => [
+            'ok' => $result
+        ]];
     }
 
     public function indexAction()
@@ -43,7 +41,7 @@ class Controller
      */
     public function fetchChartDataAction()
     {
-        $store = new StoreManager();
+        $store = new StoreManager($_POST['date'] ?? null);
 
         $lmeAverData = $store->fetchFromStore('lme_average', 20, 'csv');
         $minfAverData = $store->fetchFromStore('minfin_average', 20, 'csv');
