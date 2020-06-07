@@ -32,10 +32,13 @@ function Prize({prize, prizeChangeEvent}) {
 // Цена минус процент
 //Поменять процент на пропсы после возможности их обновления
 function PriceWithDiscount(props) {
+  const [value, setValue] = useState(+props.firstVar * 100);
+  console.log('firstvar', props.firstVar);
   return (
     <div>
-      <h1>Цена -10%</h1>
-      {props.bn} -10% = {props.cash}
+      {props.bn} -
+      <input type="text" name="firstVar" value={value} />
+      = {props.cash}
     </div>
   )
 }
@@ -53,12 +56,12 @@ function MainPrice(props) {
 }
 
 export default function (props) {
-
+  console.log('fsdfafasd', props);
   return (
     <div>
       <MainPrice {...props} prizeChangeEvent={props.prizeChangeEvent} />
-      <PriceWithDiscount bn={props.bn} cash={props.cash}/>
-      <PriceWithDiscount bn={props.bn} cash={props.cash}/>
+      <PriceWithDiscount bn={props.bn} cash={props.cash} firstVar={props.firstVar}/>
+      <PriceWithDiscount bn={props.bn} cash={props.cash} firstVar={10}/>
     </div>
   );
 }

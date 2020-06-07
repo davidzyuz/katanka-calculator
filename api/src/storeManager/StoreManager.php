@@ -81,6 +81,7 @@ class StoreManager
         $generatedFilename = $this->generateFilename($filename, $extension);
         $resource = fopen($generatedFilename, 'wt');
         $storedData['prize'] = $_POST['prize'];
+        $storedData['first_var'] = $_POST['first_var'] ?? $storedData['first_var'];
         $keys = array_keys($storedData);
         $values = array_values($storedData);
         $content = array_reduce($keys, function ($acc, $elem) {
