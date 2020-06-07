@@ -1,0 +1,10 @@
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker__month-select,
+.react-datepicker__month-select > option {
+    text-transform: capitalize;
+}
+
+.react-datepicker__header > div:first-of-type {
+    display:none;
+}
