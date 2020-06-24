@@ -28,7 +28,6 @@ export default function () {
   useEffect(() => {
     api.performAction(action)
       .then(data => {
-        console.log('first data:', data);
         switch(action) {
           case 'init':
             const { first_var: firstVar, second_var: secondVar } = data;
@@ -96,7 +95,6 @@ export default function () {
 
     api.performAction('chart_data', params)
       .then(data => {
-        console.log('')
         setChartData([...data]);
       })
       .catch(error => console.error(error));

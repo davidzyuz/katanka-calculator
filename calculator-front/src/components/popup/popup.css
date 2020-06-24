@@ -1,0 +1,13 @@
+/*
+.popup {
+	display: none;
+	width: max-content;
+	height: max-content;
+	border: 1px solid #ccc;
+	background-color: #fff;
+	padding: 10px 5px;
+}
+
+.popup[data-show] {
+  display: block;
+}*/

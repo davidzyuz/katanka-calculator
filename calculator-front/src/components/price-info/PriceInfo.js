@@ -1,4 +1,8 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useRef, forwardRef} from "react";
+import Popup from "../popup/Popup";
+import { usePopper } from "react-popper";
+
+import "./price-info.css";
 
 // Премия
 function Prize({prize, prizeChangeEvent}) {
@@ -32,36 +36,88 @@ function Prize({prize, prizeChangeEvent}) {
 // Цена минус процент
 //Поменять процент на пропсы после возможности их обновления
 function PriceWithDiscount(props) {
-  const [value, setValue] = useState(+props.firstVar * 100);
-  console.log('firstvar', props.firstVar);
+  const [value, setValue] = useState(0);
+
+  if (value !== props.firstVar) {
+    setValue(props.firstVar);
+  }
+
   return (
     <div>
       {props.bn} -
-      <input type="text" name="firstVar" value={value} />
+      <input type="number" name={props.inputName} value={100 - value * 100} />
       = {props.cash}
     </div>
   )
 }
 
-// Главная цена
-function MainPrice(props) {
+function AverageValue(props) {
+  const { id, clickHandler } = props;
+  // return <div id={props.id} onClick={props.clickHandler}>({props.average}</div>; TODO:: uncomment for prod
+  return <div id={id} onClick={clickHandler}>(averVal</div>;
+}
+
+/**
+ * Main price component
+ *
+ * @param props
+ * @returns {*}
+ * @constructor
+ */
+function MainPrice (props) {
+  const [referenceElement, setReferenceElement] = useState(null),
+    [popperElement, setPopperElement] = useState(null),
+    [arrowElement, setArrowElement] = useState(null),
+    instance = usePopper(referenceElement, popperElement, {
+    modifiers: [{ name: 'arrow', options: { element: arrowElement } }],
+  });
+  // TODO: about update https://popper.js.org/docs/v2/constructors/#types
+  const show = () => popperElement.setAttribute('data-show', '');
+
+  const clickHandler = (e) => {
+    console.log(e.target);
+    setReferenceElement(e.target);
+    show();
+  }
+
+  const hide = () => popperElement.removeAttribute('data-show');
+
+  const popupOnClick = (e) => {
+    hide();
+  };
+
   return (
     <div>
       <h1>Цена</h1>
-      ({props.lmeAverage} +
-      <Prize prize={props.prize} prizeChangeEvent={props.prizeChangeEvent}/>
-      ) x {props.minfinAverage} x 1,2 = {props.bn}
+      <div className="container">
+        <div className="container-inner" onClick={clickHandler} />
+        <div className="container-inner" onClick={clickHandler} />
+      </div>
+      {/*<AverageValue id="lme-average" average={props.lmeAverage} clickHandler={clickHandler}/> +*/}
+      {/*<Prize prize={props.prize} prizeChangeEvent={props.prizeChangeEvent} />) x*/}
+      {/*<AverageValue id="minfin-average" average={props.minfinAverage} clickHandler={clickHandler}/> x 1,2 = {props.bn}*/}
+      <div ref={setPopperElement}>popup</div>
+      {/*<Popup ref={setPopperElement} clickHandler={popupOnClick} />*/}
     </div>
-  )
+/*    <>
+      <button type="button" ref={setReferenceElement}>
+        Reference element
+      </button>
+
+      <div ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+        Popper element
+        <div ref={setArrowElement} style={styles.arrow} />
+      </div>
+    </>*/
+  );
 }
 
 export default function (props) {
-  console.log('fsdfafasd', props);
   return (
-    <div>
+    <div id="price-container">
       <MainPrice {...props} prizeChangeEvent={props.prizeChangeEvent} />
-      <PriceWithDiscount bn={props.bn} cash={props.cash} firstVar={props.firstVar}/>
-      <PriceWithDiscount bn={props.bn} cash={props.cash} firstVar={10}/>
+      {/*<PriceWithDiscount bn={props.bn} cash={props.cash} inputName="hello" firstVar={props.firstVar}/>
+      <PriceWithDiscount bn={props.bn} cash={props.cash} inputName="firstVar" firstVar={0.9}/>*/}
     </div>
   );
 }
