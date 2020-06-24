@@ -13,6 +13,8 @@ use app\parser\MinfinParser;
 class StoreManager
 {
     const COOL_DOWN = 86400;
+    const STATUS_STORED = 1;
+    const STATUS_FAILED = 0;
 
     /**
      * Path to store.

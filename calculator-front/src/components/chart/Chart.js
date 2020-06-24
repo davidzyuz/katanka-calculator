@@ -3,6 +3,31 @@ import ChartJs from "chart.js";
 
 import "./chart.css";
 
+/*
+const testData = [
+  168068,
+  169042,
+  169419,
+  170088,
+  169992,
+  170253,
+  170897,
+  171087,
+  171400,
+  171749,
+  171174,
+  170585,
+  170780,
+  171145,
+  171313,
+  171512,
+  171478,
+  171303,
+  171054,
+  170569
+];
+*/
+
 //available keys: date, price, cashless
 function formatToValues(data, key) {
   return data.reduce((acc, curr) => {
@@ -36,7 +61,9 @@ export default function(props) {
           borderWidth: 1,
           borderColor: [
             'rgba(15, 76, 129, 1)'
-          ]
+          ],
+          pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+          pointRadius: 5
         }],
       },
       options: {
@@ -51,10 +78,19 @@ export default function(props) {
               minRotation: 45
             }
           }]
-        }
+        },
+        elements: {
+          line: {
+            tension: 0
+          }
+        },
       }
     });
   }, [ctx]);
 
-  return <canvas ref={ctx} id="katanka-chart" width="400" height="400" role="img"/>
+  return (
+    <div className="chart-container">
+      <canvas ref={ctx} id="katanka-chart" width="400" height="400" role="img"/>
+    </div>
+  );
 }

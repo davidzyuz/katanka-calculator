@@ -11,11 +11,9 @@ class Controller
     public function updateAction()
     {
         $store = new StoreManager();
-        $result = $store->updateFormulaValues('formula_values', 'csv');
+        $stored = $store->updateFormulaValues('formula_values', 'csv');
 
-        return ['status' => [
-            'ok' => $result
-        ]];
+        return  $stored ? ['status' => StoreManager::STATUS_STORED] : ['status' => StoreManager::STATUS_FAILED];
     }
 
     public function indexAction()

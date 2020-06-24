@@ -53,8 +53,7 @@ function PriceWithDiscount(props) {
 
 function AverageValue(props) {
   const { id, clickHandler } = props;
-  // return <div id={props.id} onClick={props.clickHandler}>({props.average}</div>; TODO:: uncomment for prod
-  return <div id={id} onClick={clickHandler}>(averVal</div>;
+  return <div id={props.id} onClick={props.clickHandler}>({props.average}</div>;
 }
 
 /**
@@ -89,15 +88,10 @@ function MainPrice (props) {
   return (
     <div>
       <h1>Цена</h1>
-      <div className="container">
-        <div className="container-inner" onClick={clickHandler} />
-        <div className="container-inner" onClick={clickHandler} />
-      </div>
-      {/*<AverageValue id="lme-average" average={props.lmeAverage} clickHandler={clickHandler}/> +*/}
-      {/*<Prize prize={props.prize} prizeChangeEvent={props.prizeChangeEvent} />) x*/}
-      {/*<AverageValue id="minfin-average" average={props.minfinAverage} clickHandler={clickHandler}/> x 1,2 = {props.bn}*/}
-      <div ref={setPopperElement}>popup</div>
-      {/*<Popup ref={setPopperElement} clickHandler={popupOnClick} />*/}
+      <AverageValue id="lme-average" average={props.lmeAverage} clickHandler={clickHandler}/> +
+      <Prize prize={props.prize} prizeChangeEvent={props.prizeChangeEvent} />) x
+      <AverageValue id="minfin-average" average={props.minfinAverage} clickHandler={clickHandler}/> x 1,2 = {props.bn}
+      {/*<Popup ref={setPopperElement} clickHandler={popupOnClick} /> uncomment, when  back to popups*/}
     </div>
 /*    <>
       <button type="button" ref={setReferenceElement}>
@@ -116,8 +110,8 @@ export default function (props) {
   return (
     <div id="price-container">
       <MainPrice {...props} prizeChangeEvent={props.prizeChangeEvent} />
-      {/*<PriceWithDiscount bn={props.bn} cash={props.cash} inputName="hello" firstVar={props.firstVar}/>
-      <PriceWithDiscount bn={props.bn} cash={props.cash} inputName="firstVar" firstVar={0.9}/>*/}
+      <PriceWithDiscount bn={props.bn} cash={props.cash} inputName="hello" firstVar={props.firstVar}/>
+      <PriceWithDiscount bn={props.bn} cash={props.cash} inputName="firstVar" firstVar={0.9}/>
     </div>
   );
 }

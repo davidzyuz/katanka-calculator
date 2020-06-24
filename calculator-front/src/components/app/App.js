@@ -8,7 +8,10 @@ import {registerLocale, setDefaultLocale} from "react-datepicker";
 import ru from "date-fns/locale/ru";
 
 registerLocale('ru', ru);
-setDefaultLocale('ru')
+setDefaultLocale('ru');
+
+const STATUS_STORED = 1;
+const STATUS_FAILED = 0;
 
 export default function () {
   const api = new Api(),
@@ -67,7 +70,7 @@ export default function () {
   function prizeChangeEvent(action, params) {
     api.performAction(action, params)
       .then(data => {
-        if (data.status.ok) {
+        if (data.status === STATUS_STORED) {
           setWasUpdated(true);
           setAction('init');
         }
