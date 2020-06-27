@@ -5,7 +5,7 @@ import { usePopper } from "react-popper";
 import "./price-info.css";
 
 // Премия
-function Prize({prize, prizeChangeEvent}) {
+function Prize({prize, formulaValueChangeEvent}) {
   const [prizeVal, setPrizeVal] = useState(null),
     [prevPrize, setPrevPrize] = useState(null);
 
@@ -21,7 +21,7 @@ function Prize({prize, prizeChangeEvent}) {
 
   function blurHandler() {
     const params = {prize: prizeVal};
-    prizeChangeEvent('update', params);
+    formulaValueChangeEvent('update', params);
   }
 
   return (<input
@@ -45,7 +45,12 @@ function PriceWithDiscount(props) {
   return (
     <div>
       {props.bn} -
-      <input type="number" name={props.inputName} value={100 - value * 100} />
+      <input
+        type="number"
+        name={props.inputName}
+        value={100 - value * 100}
+        onBlur={props.firstVarChangeEvent}
+      />
       = {props.cash}
     </div>
   )
@@ -89,7 +94,7 @@ function MainPrice (props) {
     <div>
       <h1>Цена</h1>
       <AverageValue id="lme-average" average={props.lmeAverage} clickHandler={clickHandler}/> +
-      <Prize prize={props.prize} prizeChangeEvent={props.prizeChangeEvent} />) x
+      <Prize prize={props.prize} formulaValueChangeEvent={props.formulaValueChangeEvent} />) x
       <AverageValue id="minfin-average" average={props.minfinAverage} clickHandler={clickHandler}/> x 1,2 = {props.bn}
       {/*<Popup ref={setPopperElement} clickHandler={popupOnClick} /> uncomment, when  back to popups*/}
     </div>
@@ -109,7 +114,7 @@ function MainPrice (props) {
 export default function (props) {
   return (
     <div id="price-container">
-      <MainPrice {...props} prizeChangeEvent={props.prizeChangeEvent} />
+      <MainPrice {...props} formulaValueChangeEvent={props.formulaValueChangeEvent} />
       <PriceWithDiscount bn={props.bn} cash={props.cash} inputName="hello" firstVar={props.firstVar}/>
       <PriceWithDiscount bn={props.bn} cash={props.cash} inputName="firstVar" firstVar={0.9}/>
     </div>

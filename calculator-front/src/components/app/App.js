@@ -67,7 +67,7 @@ export default function () {
    * @param action
    * @param params object
    */
-  function prizeChangeEvent(action, params) {
+  function formulaValueChangeEvent(action, params) {
     api.performAction(action, params)
       .then(data => {
         if (data.status === STATUS_STORED) {
@@ -106,7 +106,7 @@ export default function () {
   return (
     <Fragment>
       <Header {...initData} />
-      <PriceInfo {...initData} prizeChangeEvent={prizeChangeEvent}/>
+      <PriceInfo {...initData} formulaValueChangeEvent={formulaValueChangeEvent}/>
       <Datepicker datepickerChangeEvent={datepickerChangeEvent}/>
       <Chart chartEvent={chartEvent} chartData={chartData}/>
     </Fragment>
