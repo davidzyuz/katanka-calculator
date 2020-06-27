@@ -17,6 +17,13 @@ class StoreManager
     const STATUS_FAILED = 0;
 
     /**
+     * Constants for inner updateFormulaValues checks.
+     */
+    const PRIZE = 1;
+    const FIRST_VAR = 2;
+    const SECOND_VAR = 3;
+
+    /**
      * Path to store.
      *
      * @var string
@@ -37,21 +44,56 @@ class StoreManager
     }
 
     /**
-     * Set path to store
-     * @param $storePath
+     * Updates formula_values.csv.
+     *
+     * @param string $filename
+     * @param string $extension
+     * @return bool
      */
-    public function setStorePath($storePath)
+    public function updateFormulaValues(string $filename, string $extension)
     {
-        $this->_storePath = $storePath;
-    }
+        if (!isset($_POST['value_to_change'])) {
+            throw new \Exception('The param "value_to_change" should be provided in POST body');
+        }
 
-    /**
-     * Get path to store
-     * @return string
-     */
-    public function getStorePath(): string
-    {
-        return $this->_storePath;
+        // Fetch formula values and update necessary field.
+        $storedData = $this->fetchFormulaValues();
+
+        switch ($_POST['value_to_change']) {
+            case self::PRIZE:
+                $storedData['prize'] = $_POST['value'];
+                break;
+            case self::FIRST_VAR:
+                $storedData['first_var'] = $_POST['value'];
+                break;
+            case self::SECOND_VAR:
+                $storedData['second_var'] = $_POST['value'];
+                break;
+            default:
+                break;
+        }
+
+        // Prepare updated content to write. The idea is to use keys as column names
+        // and values - as field values, accordingly to csv file format.
+        $keys = array_keys($storedData);
+        $values = array_values($storedData);
+        $content = array_reduce($keys, function ($acc, $elem) {
+            return $acc .= ($elem . ',');
+        }, '');
+        $content = rtrim($content, ',');
+        $content .= "\n";
+        $content .= array_reduce($values, function ($acc, $elem) {
+            return $acc .= ($elem . ',');
+        }, '');
+        $content = rtrim($content, ',');
+        $content .= "\n";
+
+        $generatedFilename = $this->generateFilename($filename, $extension);
+        $resource = fopen($generatedFilename, 'wt');
+        fwrite($resource, $content, strlen($content));
+        fclose($resource);
+
+        return true;
     }
 
     /**
@@ -77,29 +119,34 @@ class StoreManager
         return array_combine($keys, $values);
     }
 
-    public function updateFormulaValues(string $filename, string $extension)
+    /**
+     * Generates a path to specific store
+     * @param string $name
+     * @param string $extension
+     * @return string
+     */
+    public function generateFilename(string $name, string $extension): string
     {
-        $storedData = $this->fetchFormulaValues();
-        $generatedFilename = $this->generateFilename($filename, $extension);
-        $resource = fopen($generatedFilename, 'wt');
-        $storedData['prize'] = $_POST['prize'];
-        $storedData['first_var'] = $_POST['first_var'] ?? $storedData['first_var'];
-        $keys = array_keys($storedData);
-        $values = array_values($storedData);
-        $content = array_reduce($keys, function ($acc, $elem) {
-            return $acc .= ($elem . ',');
-        }, '');
-        $content = rtrim($content, ',');
-        $content .= "\n";
-        $content .= array_reduce($values, function ($acc, $elem) {
-            return $acc .= ($elem . ',');
-        }, '');
-        $content = rtrim($content, ',');
-        $content .= "\n";
-        fwrite($resource, $content, strlen($content));
-        fclose($resource);
+        $path = $this->getStorePath();
+        return $path . $name . '.' . $extension;
+    }
 
-        return true;
+    /**
+     * Get path to store
+     * @return string
+     */
+    public function getStorePath(): string
+    {
+        return $this->_storePath;
+    }
+
+    /**
+     * Set path to store
+     * @param $storePath
+     */
+    public function setStorePath($storePath)
+    {
+        $this->_storePath = $storePath;
     }
 
     /**
@@ -170,60 +217,6 @@ class StoreManager
     }
 
     /**
-     * Generates a path to specific store
-     * @param string $name
-     * @param string $extension
-     * @return string
-     */
-    public function generateFilename(string $name, string $extension): string
-    {
-        $path = $this->getStorePath();
-        return $path . $name . '.' . $extension;
-    }
-
-    public function writeToTest()
-    {
-        $filename = $this->generateFilename('test', 'csv');
-        $content = file_get_contents($filename);
-        $content .= "test \n";
-        $resource = fopen($filename, 'w');
-        fwrite($resource, $content);
-        fclose($resource);
-    }
-
-    /**
-     * Helper method for get unique values from multidimensional array.
-     *
-     * @param $array
-     * @param $key
-     * @return array
-     */
-    private function _uniqueMultidimArray($array, $key) {
-        $result = [];
-        foreach ($array as $k => $set) {
-            if (!isset($temp)) {
-                $temp = $set;
-                continue; //пропускаем первую итерацию, инициализируем $temp
-            }
-
-            if ($set[$key] !== $temp[$key]) {
-                $result[] = $temp;
-            }
-
-            $temp = $set;
-        }
-
-        $last = count($result) - 1;
-
-        if ($result[$last][$key] === $temp[$key]) {
-            $result[$last] = $temp;
-        } else {
-            $result[] = $temp;
-        }
-        return $result;
-    }
-
-    /**
      * Format data accordingly provided attribute
      * @param array $data
      * @param int $offset
@@ -277,5 +270,47 @@ class StoreManager
         }
 
         return $newArr;
+    }
+
+    /**
+     * Helper method for get unique values from multidimensional array.
+     *
+     * @param $array
+     * @param $key
+     * @return array
+     */
+    private function _uniqueMultidimArray($array, $key) {
+        $result = [];
+        foreach ($array as $k => $set) {
+            if (!isset($temp)) {
+                $temp = $set;
+                continue; //пропускаем первую итерацию, инициализируем $temp
+            }
+
+            if ($set[$key] !== $temp[$key]) {
+                $result[] = $temp;
+            }
+
+            $temp = $set;
+        }
+
+        $last = count($result) - 1;
+
+        if ($result[$last][$key] === $temp[$key]) {
+            $result[$last] = $temp;
+        } else {
+            $result[] = $temp;
+        }
+        return $result;
+    }
+
+    public function writeToTest()
+    {
+        $filename = $this->generateFilename('test', 'csv');
+        $content = file_get_contents($filename);
+        $content .= "test \n";
+        $resource = fopen($filename, 'w');
+        fwrite($resource, $content);
+        fclose($resource);
     }
 }

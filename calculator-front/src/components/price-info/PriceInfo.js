@@ -4,6 +4,10 @@ import { usePopper } from "react-popper";
 
 import "./price-info.css";
 
+const PRIZE = 1;
+const FIRST_VAR = 2;
+const SECOND_VAR = 3;
+
 // Премия
 function Prize({prize, formulaValueChangeEvent}) {
   const [prizeVal, setPrizeVal] = useState(null),
@@ -20,7 +24,7 @@ function Prize({prize, formulaValueChangeEvent}) {
   }
 
   function blurHandler() {
-    const params = {prize: prizeVal};
+    const params = {'value': prizeVal, 'value_to_change': PRIZE};
     formulaValueChangeEvent('update', params);
   }
 

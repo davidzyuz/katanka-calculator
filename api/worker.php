@@ -14,11 +14,11 @@ use app\storeManager\StoreManager;
 
 $worker = new Worker();
 
-//$worker->fetchData();
-//$worker->writeToTemp($worker->lmeData, 'lme_temp');//lme
-//$worker->writeToTemp($worker->minfinData, 'minfin_temp');//minfin
-//$isStoredLme = $worker->rebaseToMainStore('lme_temp', 'lme');
-//$isStoredMinfin = $worker->rebaseToMainStore('minfin_temp', 'minfin');
+$worker->fetchData();
+$worker->writeToTemp($worker->lmeData, 'lme_temp');//lme
+$worker->writeToTemp($worker->minfinData, 'minfin_temp');//minfin
+$isStoredLme = $worker->rebaseToMainStore('lme_temp', 'lme');
+$isStoredMinfin = $worker->rebaseToMainStore('minfin_temp', 'minfin');
 
 // Если хотябы одно из значений изменилось - пересчитать if $result1 === true
 if ($isStoredLme) {
