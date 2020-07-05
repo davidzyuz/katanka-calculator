@@ -56,14 +56,21 @@ class Calculator
      */
     public function cashFormula($averageLme, $averageMinfin, $prize)
     {
-        return round(($averageLme + $prize) * $averageMinfin * 1.2 * 0.9, 3);
+        $store = new StoreManager();
+        $formulaValues = $store->fetchFormulaValues();
+        $percent = self::convertToPercent($formulaValues['first_var']);
+
+        return round(($averageLme + $prize) * $averageMinfin * 1.2 * $percent, 3);
     }
 
     /**
-     * Render an end data
+     * Converts value to percent.
+     *
+     * @param int $num
+     * @return float
      */
-    public function render()
+    protected static function convertToPercent(int $num): float
     {
-
+        return (100 - $num) / 100;
     }
 }

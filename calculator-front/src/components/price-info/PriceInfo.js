@@ -1,4 +1,4 @@
-import React, {useState, useRef, forwardRef} from "react";
+import React, {useState, useEffect} from "react";
 import Popup from "../popup/Popup";
 import { usePopper } from "react-popper";
 
@@ -7,6 +7,7 @@ import "./price-info.css";
 const PRIZE = 1;
 const FIRST_VAR = 2;
 const SECOND_VAR = 3;
+const DEFAULT_FIRST_VAR = 10;
 
 // Премия
 function Prize({prize, formulaValueChangeEvent}) {
@@ -37,13 +38,29 @@ function Prize({prize, formulaValueChangeEvent}) {
     onSubmit={(e) => e.preventDefault()}/>);
 }
 
-// Цена минус процент
-//Поменять процент на пропсы после возможности их обновления
+// Price subtract percent
 function PriceWithDiscount(props) {
-  const [value, setValue] = useState(0);
+  const [inputVal, setInputVal] = useState(0);
 
-  if (value !== props.firstVar) {
-    setValue(props.firstVar);
+  if (inputVal === 0 && !isNaN(props.firstVar)) {
+    setInputVal(props.firstVar);
+  }
+
+  // Have no idea how to do better
+  const [percent, setPercent] = useState(0);
+
+  function blurHandler(e) {
+    setPercent(inputVal);
+  }
+
+  useEffect(() => {
+    const params = {'value': percent, 'value_to_change': FIRST_VAR};
+    props.formulaValueChangeEvent('update', params);
+  }, [percent]);
+
+  function changeHandler(e) {
+    const value = Number(e.target.value);
+    setInputVal(value.toString());
   }
 
   return (
@@ -52,10 +69,11 @@ function PriceWithDiscount(props) {
       <input
         type="number"
         name={props.inputName}
-        value={100 - value * 100}
-        onBlur={props.firstVarChangeEvent}
+        value={inputVal}
+        onChange={changeHandler}
+        onBlur={blurHandler}
       />
-      = {props.cash}
+      = {props.bn * ((100 - percent) / 100)}
     </div>
   )
 }
@@ -100,27 +118,17 @@ function MainPrice (props) {
       <AverageValue id="lme-average" average={props.lmeAverage} clickHandler={clickHandler}/> +
       <Prize prize={props.prize} formulaValueChangeEvent={props.formulaValueChangeEvent} />) x
       <AverageValue id="minfin-average" average={props.minfinAverage} clickHandler={clickHandler}/> x 1,2 = {props.bn}
-      {/*<Popup ref={setPopperElement} clickHandler={popupOnClick} /> uncomment, when  back to popups*/}
     </div>
-/*    <>
-      <button type="button" ref={setReferenceElement}>
-        Reference element
-      </button>
-
-      <div ref={setPopperElement} style={styles.popper} {...attributes.popper}>
-        Popper element
-        <div ref={setArrowElement} style={styles.arrow} />
-      </div>
-    </>*/
   );
 }
 
 export default function (props) {
+  const { bn, cash, firstVar, formulaValueChangeEvent } = props;
   return (
     <div id="price-container">
-      <MainPrice {...props} formulaValueChangeEvent={props.formulaValueChangeEvent} />
-      <PriceWithDiscount bn={props.bn} cash={props.cash} inputName="hello" firstVar={props.firstVar}/>
-      <PriceWithDiscount bn={props.bn} cash={props.cash} inputName="firstVar" firstVar={0.9}/>
+      <MainPrice {...props} />
+      <PriceWithDiscount bn={bn} cash={cash} inputName="firstVar" firstVar={firstVar} formulaValueChangeEvent={formulaValueChangeEvent}/>
+      <PriceWithDiscount bn={bn} cash={cash} inputName="firstVar" firstVar={DEFAULT_FIRST_VAR} formulaValueChangeEvent={formulaValueChangeEvent}/>
     </div>
   );
 }
