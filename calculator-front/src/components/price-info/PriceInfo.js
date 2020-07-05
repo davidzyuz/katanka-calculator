@@ -40,14 +40,15 @@ function Prize({prize, formulaValueChangeEvent}) {
 
 // Price subtract percent
 function PriceWithDiscount(props) {
-  const [inputVal, setInputVal] = useState(0);
+  const [inputVal, setInputVal] = useState(null),
+    [prevVal, setPrevVal] = useState(null),
+    [percent, setPercent] = useState(null);
 
-  if (inputVal === 0 && !isNaN(props.firstVar)) {
+  if (prevVal !== props.firstVar) {
+    setPrevVal(props.firstVar);
     setInputVal(props.firstVar);
+    setPercent(props.firstVar);
   }
-
-  // Have no idea how to do better
-  const [percent, setPercent] = useState(0);
 
   function blurHandler(e) {
     setPercent(inputVal);
