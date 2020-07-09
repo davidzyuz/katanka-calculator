@@ -42,7 +42,7 @@ function Prize({prize, formulaValueChangeEvent}) {
 function PriceWithDiscount(props) {
   const [inputVal, setInputVal] = useState(null),
     [prevVal, setPrevVal] = useState(null),
-    [percent, setPercent] = useState(null);
+    [percent, setPercent] = useState(0);
 
   if (prevVal !== props.firstVar) {
     setPrevVal(props.firstVar);
@@ -66,7 +66,7 @@ function PriceWithDiscount(props) {
 
   return (
     <div>
-      {props.bn}
+      {formatPrice(props.bn)}
       <span className="sign">-</span>
       <input
         type="number"
@@ -77,7 +77,7 @@ function PriceWithDiscount(props) {
       />
       <span className="sign">%</span>
       <span className="sign">=</span>
-      {props.bn * ((100 - percent) / 100)}
+      {formatPrice(props.bn * ((100 - percent) / 100))}
     </div>
   )
 }
@@ -85,6 +85,10 @@ function PriceWithDiscount(props) {
 function AverageValue(props) {
   const { id, clickHandler } = props;
   return <div id={props.id} onClick={props.clickHandler}>{props.average}</div>;
+}
+
+function formatPrice(num) {
+  return Math.round(num).toLocaleString('ru-RU', {style: 'decimal'});
 }
 
 /**
@@ -128,7 +132,7 @@ function MainPrice (props) {
       <span className="sign">x</span>
       1,2
       <span className="sign">=</span>
-      {props.bn}
+      {formatPrice(props.bn)}
     </div>
   );
 }
