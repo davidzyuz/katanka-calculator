@@ -66,7 +66,8 @@ function PriceWithDiscount(props) {
 
   return (
     <div>
-      {props.bn} -
+      {props.bn}
+      <span className="sign">-</span>
       <input
         type="number"
         name={props.inputName}
@@ -74,14 +75,16 @@ function PriceWithDiscount(props) {
         onChange={changeHandler}
         onBlur={blurHandler}
       />
-      = {props.bn * ((100 - percent) / 100)}
+      <span className="sign">%</span>
+      <span className="sign">=</span>
+      {props.bn * ((100 - percent) / 100)}
     </div>
   )
 }
 
 function AverageValue(props) {
   const { id, clickHandler } = props;
-  return <div id={props.id} onClick={props.clickHandler}>({props.average}</div>;
+  return <div id={props.id} onClick={props.clickHandler}>{props.average}</div>;
 }
 
 /**
@@ -114,11 +117,18 @@ function MainPrice (props) {
   };
 
   return (
-    <div>
-      <h1>Цена</h1>
-      <AverageValue id="lme-average" average={props.lmeAverage} clickHandler={clickHandler}/> +
-      <Prize prize={props.prize} formulaValueChangeEvent={props.formulaValueChangeEvent} />) x
-      <AverageValue id="minfin-average" average={props.minfinAverage} clickHandler={clickHandler}/> x 1,2 = {props.bn}
+    <div id="main-price-container">
+      <span className="sign">(</span>
+      <AverageValue id="lme-average" average={props.lmeAverage} clickHandler={clickHandler}/>
+      <span className="sign">+</span>
+      <Prize prize={props.prize} formulaValueChangeEvent={props.formulaValueChangeEvent} />)
+      <span className="sign">)</span>
+      <span className="sign">x</span>
+      <AverageValue id="minfin-average" average={props.minfinAverage} clickHandler={clickHandler}/>
+      <span className="sign">x</span>
+      1,2
+      <span className="sign">=</span>
+      {props.bn}
     </div>
   );
 }
@@ -126,10 +136,15 @@ function MainPrice (props) {
 export default function (props) {
   const { bn, cash, firstVar, formulaValueChangeEvent } = props;
   return (
-    <div id="price-container">
-      <MainPrice {...props} />
-      <PriceWithDiscount bn={bn} cash={cash} inputName="firstVar" firstVar={firstVar} formulaValueChangeEvent={formulaValueChangeEvent}/>
-      <PriceWithDiscount bn={bn} cash={cash} inputName="firstVar" firstVar={DEFAULT_FIRST_VAR} formulaValueChangeEvent={formulaValueChangeEvent}/>
+    <div id="price">
+      <div id="price-title">
+        <h1>Цена</h1>
+      </div>
+      <div id="price-container">
+        <MainPrice {...props} />
+        <PriceWithDiscount bn={bn} cash={cash} inputName="firstVar" firstVar={firstVar} formulaValueChangeEvent={formulaValueChangeEvent}/>
+        <PriceWithDiscount bn={bn} cash={cash} inputName="firstVar" firstVar={DEFAULT_FIRST_VAR} formulaValueChangeEvent={formulaValueChangeEvent}/>
+      </div>
     </div>
   );
 }

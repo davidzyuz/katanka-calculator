@@ -47,7 +47,6 @@ export default function(props) {
     dates = formatToValues(props.chartData, 'date'),
     cashless = formatToValues(props.chartData, 'cashless');
 
-  console.log(prices);
 
   // Отрисовка графика
   useEffect(() => {
@@ -56,13 +55,13 @@ export default function(props) {
       data: {
         labels: dates,
         datasets: [{
-          label: '# of Votes', // заглавие (в самом верху графика
+          label: 'Динамика Цены', // заглавие (в самом верху графика
           data: prices, // данные для графика
           borderWidth: 1,
           borderColor: [
             'rgba(15, 76, 129, 1)'
           ],
-          pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+          pointBackgroundColor: 'rgba(15, 76, 129, 1)',
           pointRadius: 5
         }],
       },

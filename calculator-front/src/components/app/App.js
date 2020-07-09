@@ -7,6 +7,8 @@ import Api from "../../api";
 import {registerLocale, setDefaultLocale} from "react-datepicker";
 import ru from "date-fns/locale/ru";
 
+import "./app.css";
+
 registerLocale('ru', ru);
 setDefaultLocale('ru');
 
