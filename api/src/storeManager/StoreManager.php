@@ -157,12 +157,19 @@ class StoreManager
      */
     public function writeToStore(float $data, string $filename, string $extension)
     {
-        $generateFilename = $this->generateFilename($filename, $extension);
-        $resource = fopen($generateFilename, 'at');
         $scheduledAt = '07:59:59';
         $date = date('d-m-Y', time() - self::COOL_DOWN);
+        /**
+         * TODO: Нужно поправить проверку вот здесь Worker::writeToStore()
+         * иначен средние лме и минфин не будут её проходить
+         */
+        if ($filename === 'lme_average' || $filename === 'minfin_average') {
+            $date = date('d-m-Y');
+        }
         $scheduledFullString = $date . ' ' . $scheduledAt;
         $timestamp = strtotime($scheduledFullString);
+        $generateFilename = $this->generateFilename($filename, $extension);
+        $resource = fopen($generateFilename, 'at');
         $fields = [$timestamp, $data, $date];
         fputcsv($resource, $fields);
         fclose($resource);

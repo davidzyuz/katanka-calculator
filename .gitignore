@@ -1,7 +1,7 @@
 .htaccess
 vendor
 .idea
-src/store
+api/src/store
 src/assets
 js-dev/node_modules
 test.php

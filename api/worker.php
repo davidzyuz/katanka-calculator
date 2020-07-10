@@ -20,7 +20,7 @@ $worker->writeToTemp($worker->minfinData, 'minfin_temp');//minfin
 $isStoredLme = $worker->rebaseToMainStore('lme_temp', 'lme');
 $isStoredMinfin = $worker->rebaseToMainStore('minfin_temp', 'minfin');
 
-// Если хотябы одно из значений изменилось - пересчитать if $result1 === true
+// Если хотябы одно из значений изменилось - пересчитать
 if ($isStoredLme) {
     $worker->calculateAverage(Worker::LME_TYPE);
     $worker->writeAverage(Worker::LME_TYPE);
