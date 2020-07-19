@@ -37,10 +37,8 @@ function formatToValues(data, key) {
 }
 
 export default function(props) {
-  if (!props.chartData.length) {
-    const { chartEvent } = props;
-    chartEvent();
-    return <h3>loading...</h3>;
+  if (!props.chartData) {
+    return <h3>Загрузка...</h3>;
   }
   const ctx = React.createRef(),
     prices = formatToValues(props.chartData, 'price'),

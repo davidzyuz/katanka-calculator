@@ -29,6 +29,7 @@ class Controller
         $responseData['currentMinfin'] = $calc->currentMinfin;
         $responseData['storedLmeDate'] = $calc->storedLmeDate;
         $responseData['storedMinfinDate'] = $calc->storedMinfinDate;
+        $responseData['chartData'] = $this->fetchChartDataAction();
 
         return $responseData;
     }

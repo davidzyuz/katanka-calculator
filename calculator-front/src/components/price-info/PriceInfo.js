@@ -33,8 +33,8 @@ function Prize({prize, formulaValueChangeEvent}) {
     type="number"
     name="prize"
     value={prizeVal}
-    onChange={changeHandler}
-    onBlur={blurHandler}
+    //onChange={changeHandler}
+   // onBlur={blurHandler}
     onSubmit={(e) => e.preventDefault()}/>);
 }
 
@@ -72,8 +72,8 @@ function PriceWithDiscount(props) {
         type="number"
         name={props.inputName}
         value={inputVal}
-        onChange={changeHandler}
-        onBlur={blurHandler}
+        //onChange={changeHandler}
+        //onBlur={blurHandler}
       />
       <span className="sign">%</span>
       <span className="sign">=</span>
@@ -109,7 +109,6 @@ function MainPrice (props) {
   const show = () => popperElement.setAttribute('data-show', '');
 
   const clickHandler = (e) => {
-    console.log(e.target);
     setReferenceElement(e.target);
     show();
   }

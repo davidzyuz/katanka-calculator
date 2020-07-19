@@ -21,7 +21,7 @@ export default function () {
     [wasUpdated, setWasUpdated] = useState(true),
     [initData, setInitData] = useState({}),
     [updateData, setUpdateData] = useState({}),
-    [chartData, setChartData] = useState({}),
+    [chartData, setChartData] = useState(null),
     [datepickerData, setDatepickerData] = useState({});
 
   /* TODO: сдeлaть так, чтобы update ничего не возвращал, (кроме успешного сообщения), а после update -> отправлять еще
@@ -31,36 +31,18 @@ export default function () {
 
 
   useEffect(() => {
-    api.performAction(action)
+    api.performAction('init')
       .then(data => {
-        switch(action) {
-          case 'init':
-            const { first_var: firstVar, second_var: secondVar } = data;
-            setInitData({firstVar, secondVar, ...data});
-            break;
-
-          case 'update':
-            setUpdateData({...data});
-            break;
-
-          case 'chart_data':
-            setChartData([...data]);
-            break;
-
-          case 'datepicker':
-            setDatepickerData({...data});
-            break;
-
-          default:
-            break;
-        }
-      })
+        const { first_var: firstVar, second_var: secondVar } = data;
+        setInitData({firstVar, secondVar, ...data});
+        })
       .catch(error => console.error(error));
 
     setWasUpdated(false);
   }, [action, wasUpdated]);
 
   function chartEvent() {
+    console.log('event dispatched');
     setAction('chart_data');
   }
 
@@ -105,12 +87,14 @@ export default function () {
       .catch(error => console.error(error));
   }
 
+  const chartResultedData = chartData === null ? initData['chartData'] : chartData;
+
   return (
     <Fragment>
       <Header {...initData} />
       <PriceInfo {...initData} formulaValueChangeEvent={formulaValueChangeEvent}/>
       <Datepicker datepickerChangeEvent={datepickerChangeEvent}/>
-      <Chart chartEvent={chartEvent} chartData={chartData}/>
+      <Chart chartEvent={chartEvent} chartData={chartResultedData}/>
     </Fragment>
   );
 }
