@@ -33,51 +33,45 @@ function Prize({prize, formulaValueChangeEvent}) {
     type="number"
     name="prize"
     value={prizeVal}
-    //onChange={changeHandler}
-   // onBlur={blurHandler}
+    onChange={changeHandler}
+    onBlur={blurHandler}
     onSubmit={(e) => e.preventDefault()}/>);
 }
 
 // Price subtract percent
-function PriceWithDiscount(props) {
-  const [inputVal, setInputVal] = useState(null),
-    [prevVal, setPrevVal] = useState(null),
-    [percent, setPercent] = useState(0);
+function PriceWithDiscount({firstVar, formulaValueChangeEvent, bn, inputName}) {
+  const [percent, setPercent] = useState(0),
+    [prevVal, setPrevVal] = useState(null);
 
-  if (prevVal !== props.firstVar) {
-    setPrevVal(props.firstVar);
-    setInputVal(props.firstVar);
-    setPercent(props.firstVar);
+  if (prevVal !== firstVar) {
+    setPrevVal(firstVar);
+    setPercent(firstVar);
   }
 
   function blurHandler(e) {
-    setPercent(inputVal);
-  }
-
-  useEffect(() => {
     const params = {'value': percent, 'value_to_change': FIRST_VAR};
-    props.formulaValueChangeEvent('update', params);
-  }, [percent]);
+    formulaValueChangeEvent('update', params);
+  }
 
   function changeHandler(e) {
     const value = Number(e.target.value);
-    setInputVal(value.toString());
+    setPercent(value.toString());
   }
 
   return (
     <div>
-      {formatPrice(props.bn)}
+      {formatPrice(bn)}
       <span className="sign">-</span>
       <input
         type="number"
-        name={props.inputName}
-        value={inputVal}
-        //onChange={changeHandler}
-        //onBlur={blurHandler}
+        name={inputName}
+        value={percent}
+        onChange={changeHandler}
+        onBlur={blurHandler}
       />
       <span className="sign">%</span>
       <span className="sign">=</span>
-      {formatPrice(props.bn * ((100 - percent) / 100))}
+      {formatPrice(bn * ((100 - percent) / 100))}
     </div>
   )
 }

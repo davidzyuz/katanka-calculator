@@ -13,15 +13,17 @@ registerLocale('ru', ru);
 setDefaultLocale('ru');
 
 const STATUS_STORED = 1;
-const STATUS_FAILED = 0;
+const FORMULA_VALUE_UPDATED = 1;
+const FORMULA_VALUE_COMMON = 2;
 
 export default function () {
   const api = new Api(),
     [action, setAction] = useState('init'),
-    [wasUpdated, setWasUpdated] = useState(true),
+    [isUpdatedFormula, setIsUpdatedFormula] = useState(FORMULA_VALUE_COMMON),
     [initData, setInitData] = useState({}),
     [updateData, setUpdateData] = useState({}),
     [chartData, setChartData] = useState(null),
+    [reInitData, setReInitData] = useState(false),
     [datepickerData, setDatepickerData] = useState({});
 
   /* TODO: сдeлaть так, чтобы update ничего не возвращал, (кроме успешного сообщения), а после update -> отправлять еще
@@ -38,11 +40,13 @@ export default function () {
         })
       .catch(error => console.error(error));
 
-    setWasUpdated(false);
-  }, [action, wasUpdated]);
+    setIsUpdatedFormula(FORMULA_VALUE_COMMON);
+  }, [isUpdatedFormula]);
 
+  /**
+   * Fires when chart data should be updated.
+   */
   function chartEvent() {
-    console.log('event dispatched');
     setAction('chart_data');
   }
 
@@ -55,15 +59,19 @@ export default function () {
     api.performAction(action, params)
       .then(data => {
         if (data.status === STATUS_STORED) {
-          setWasUpdated(true);
-          setAction('init');
+          setIsUpdatedFormula(FORMULA_VALUE_UPDATED);
         }
       })
       .catch(error => console.error(error));
   }
 
-  function datepickerChangeEvent(action, params) {
-    api.performAction(action, params)
+  /**
+   * Event that fires on date change. Fetches data for specific date, recalculate data for chart too.
+   * @param action
+   * @param params
+   */
+  function datepickerChangeEvent(params) {
+    api.performAction('datepicker', params)
       .then(data => {
         setInitData(prevData => {
           const { prize, firstVar, secondVar } = prevData,

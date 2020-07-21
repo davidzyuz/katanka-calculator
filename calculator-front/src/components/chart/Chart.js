@@ -37,6 +37,7 @@ function formatToValues(data, key) {
 }
 
 export default function(props) {
+  console.log('chart updated');
   if (!props.chartData) {
     return <h3>Загрузка...</h3>;
   }
@@ -51,7 +52,7 @@ export default function(props) {
     const chart = new ChartJs(ctx.current, {
       type: 'line',
       data: {
-        labels: dates,
+        labels: dates.map(el => el.replace(/-/g, '.').slice(0, 5)),
         datasets: [{
           label: 'Динамика Цены', // заглавие (в самом верху графика
           data: prices, // данные для графика

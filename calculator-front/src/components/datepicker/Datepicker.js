@@ -13,7 +13,7 @@ export default function({datepickerChangeEvent}) {
 
         const formattedDate = date.toLocaleDateString('ru-RU').replace(/\./g, '-');
         const params = {'date': formattedDate};
-        datepickerChangeEvent('datepicker', params);
+        datepickerChangeEvent(params);
     };
 
     return (
