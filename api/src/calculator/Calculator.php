@@ -31,7 +31,7 @@ class Calculator
                     $this->storedMinfinDate = $arr['stored_at'];
                     break;
 
-                default: continue;
+                default: break;
             }
         }
 
@@ -45,9 +45,9 @@ class Calculator
      * Формула "б/н"
      * @return int/float
      */
-    public function bnFormula($averageLme, $averageMinfin, $prize)
+    public function bnFormula($averageLme, $averageMinfin, $prize): int
     {
-        return round(($averageLme + $prize) * $averageMinfin * 1.2, 3);
+        return round(($averageLme + (float) $prize) * $averageMinfin * 1.2, 3);
     }
 
     /**

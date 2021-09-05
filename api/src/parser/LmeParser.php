@@ -32,7 +32,7 @@ class LmeParser extends Parser
         $client->setHeader('Cache-Control', 'no-cache');
         $client->setHeader('Clear-Site-Data', '*');
         $client->setHeader('Cookie', 'foo');
-        $this->crawler = $client->request('GET', self::LME_COPPER_URL);
+        $this->crawler = $client->request('GET', self::LME_COPPER_URL . '#tabIndex=0?q=' . date('Ymdhis'));
         return $this;
     }
 

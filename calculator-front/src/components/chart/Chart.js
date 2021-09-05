@@ -37,7 +37,7 @@ function formatToValues(data, key) {
 }
 
 export default function(props) {
-  console.log('chart updated');
+
   if (!props.chartData) {
     return <h3>Загрузка...</h3>;
   }
@@ -82,6 +82,7 @@ export default function(props) {
             tension: 0
           }
         },
+        events: ['click']
       }
     });
   }, [ctx]);

@@ -12,28 +12,11 @@ $controller = new Controller();
 $action = $_POST['action'] ?? 'init';
 $data = [];
 
-switch($action) {
-    case 'update':
-        echo trim(json_encode($controller->updateAction(), 0, 512));
-        break;
-
-    case 'chart_data':
-        echo trim(json_encode($controller->fetchChartDataAction(), 0, 512));
-        break;
-
-    case 'datepicker':
-        echo trim(json_encode($controller->datepickerAction(), 0, 512));
-        break;
-
-    case 'test':
-        echo trim(json_encode('hello from test'));
-        break;
-
-    case 'init':
-        echo trim(json_encode($controller->indexAction(), 0, 512));
-        break;
-
-    default:
-        throw new Exception('Invalid action');
-        break;
-}
+echo match ($action) {
+    'update' => trim(json_encode($controller->updateAction())),
+    'chart_data' => trim(json_encode($controller->fetchChartDataAction())),
+    'datepicker' => trim(json_encode($controller->datepickerAction())),
+    'test' => trim(json_encode('hello from test')),
+    'init' => trim(json_encode($controller->indexAction())),
+    default => throw new Exception('Invalid action'),
+};
